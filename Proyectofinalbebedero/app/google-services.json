@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "376290104198",
+    "project_id": "proyecto-final-bebederos",
+    "storage_bucket": "proyecto-final-bebederos.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:376290104198:android:1a7804892a9eee84019207",
+        "android_client_info": {
+          "package_name": "com.example.proyecto_final_bebedero"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOt0iS716PG4gdiV_TUHFarXYmJCkKmS0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
