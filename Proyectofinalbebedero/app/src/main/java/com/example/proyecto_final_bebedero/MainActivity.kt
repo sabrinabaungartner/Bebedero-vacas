@@ -2,21 +2,30 @@ package com.example.proyecto_final_bebedero
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
-    private val firebaseDatabaseHandler = FirebaseDatabaseHandler()
+    private val firebaseDatabaseInterface: FirebaseDatabaseInterface = FirebaseDatabaseHandler()
 
-    //Funcion que se llama cada vez que se lanza la pantalla
     override fun onCreate(savedInstanceState: Bundle?) {
-        //Lo que se quiere hacer en el inicio se hace aca
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main) //Diseño que se aplica a la pantalla de la funcion fun, a la pantalla ppal
+        setContentView(R.layout.activity_main)
 
-        firebaseDatabaseHandler.calcularPromedioTemperaturaAgua(
+        val progressBar = findViewById<ProgressBar>(R.id.circularProgressBar)
+
+        // Agrega el listener para la temperatura máxima
+        firebaseDatabaseInterface.addTemperatureMaxListener { temperaturaMaxima ->
+            progressBar.max = temperaturaMaxima.toInt()
+            Log.d("MainActivity", "La temp maxima es: ${temperaturaMaxima.toInt()}")
+        }
+
+        // Calcula el promedio de la temperatura del agua
+        firebaseDatabaseInterface.calcularPromedioTemperaturaAgua(
             onSuccessListener = { promedio ->
                 Log.d("MainActivity", "El promedio de la temperatura del agua es: $promedio")
-                // Mostrar el promedio en tu interfaz de usuario
+                val progreso = promedio.toInt()
+                progressBar.progress = progreso
             },
             onFailureListener = { error ->
                 Log.e("MainActivity", "Error al calcular el promedio de temperatura del agua: $error")

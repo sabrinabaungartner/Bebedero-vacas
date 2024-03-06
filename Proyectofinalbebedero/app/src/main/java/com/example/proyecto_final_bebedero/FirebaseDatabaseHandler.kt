@@ -6,13 +6,28 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
-class FirebaseDatabaseHandler {
+class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
     private val mDatabase: DatabaseReference = FirebaseDatabase.getInstance().reference
 
-    fun calcularPromedioTemperaturaAgua(onSuccessListener: (Double) -> Unit, onFailureListener: (String) -> Unit) {
+    override fun addTemperatureMaxListener(listener: (Double) -> Unit) {
+        val temperaturaMaximaRef = mDatabase.child("parametros").child("temperatura_maxima")
+
+        temperaturaMaximaRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val temperaturaMaxima = dataSnapshot.getValue(Double::class.java) ?: 0.0
+                listener(temperaturaMaxima)
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Manejar el error aquí si es necesario
+            }
+        })
+    }
+
+    override fun calcularPromedioTemperaturaAgua(onSuccessListener: (Double) -> Unit, onFailureListener: (String) -> Unit) {
         val backupsRef = mDatabase.child("datos_backup")
 
-        backupsRef.addListenerForSingleValueEvent(object : ValueEventListener {
+        backupsRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 var totalTemperatura = 0.0
                 var numBackups = 0
