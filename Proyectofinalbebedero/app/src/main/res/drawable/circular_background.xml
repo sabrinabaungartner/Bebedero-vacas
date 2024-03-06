@@ -1,4 +1,17 @@
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="oval">
-    <solid android:color="@color/gris_claro" />
-</shape>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Círculo exterior (fondo) -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#70808080" />
+        </shape>
+    </item>
+    <!-- Círculo interior (borde) -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@android:color/transparent" />
+            <stroke
+                android:width="14dp"
+                android:color="#40303030" />
+        </shape>
+    </item>
+</layer-list>
