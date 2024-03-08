@@ -11,11 +11,18 @@ class MainActivity : AppCompatActivity() {
     private val firebaseDatabaseInterface: FirebaseDatabaseInterface = FirebaseDatabaseHandler()
     private var maxTemperature: Double = 0.0
     private var maxWaterLevel: Double = 0.0
+    private var waterQuality: Int = 1
+    private var maxDaysWithoutFill = 1
+    private var medDaysWithoutFill = 1
+    private val qualityLectureError = 99
 
     private lateinit var progressBarWaterTemperature: ProgressBar
     private lateinit var progressBarWaterLevel: ProgressBar
+    private lateinit var progressBarWaterQuality: ProgressBar
+
     private lateinit var percentageTextViewWaterTemperature: TextView
-    private lateinit var percentageTextViewWaterLevel: TextView
+    private lateinit var textViewWaterLevel: TextView
+    private lateinit var textViewWaterQuality: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,6 +30,7 @@ class MainActivity : AppCompatActivity() {
 
         initTemperatureViews()
         initWaterLevelViews()
+        initWaterQualityViews()
 
         // Escuchar cambios en los valores de la base de datos y actualizar la interfaz de usuario
         firebaseDatabaseInterface.getMaxWaterTemperature { temperature ->
@@ -42,6 +50,42 @@ class MainActivity : AppCompatActivity() {
         firebaseDatabaseInterface.getWaterLevels { _ ->
             updateWaterLevelValues()
         }
+
+        firebaseDatabaseInterface.getWaterQuality { quality ->
+            waterQuality = quality
+            if (waterQuality != qualityLectureError) {
+                updateWaterQuality()
+            }
+            else {
+                Log.d("MainActivity", "No water quality data available")
+                textViewWaterQuality.text = "NaN"
+                progressBarWaterQuality.progress = 0
+            }
+        }
+
+        firebaseDatabaseInterface.getWaterMaxDaysWithoutFill { maxDays ->
+            maxDaysWithoutFill = maxDays
+            if (maxDaysWithoutFill != qualityLectureError) {
+                updateWaterQuality()
+            }
+            else {
+                Log.d("MainActivity", "No water max quality data available")
+                textViewWaterQuality.text = "NaN"
+                progressBarWaterQuality.progress = 0
+            }
+        }
+
+        firebaseDatabaseInterface.getWaterMedDaysWithoutFill { medDays ->
+            medDaysWithoutFill = medDays
+            if (medDaysWithoutFill != qualityLectureError) {
+                updateWaterQuality()
+            }
+            else {
+                Log.d("MainActivity", "No water med quality data available")
+                textViewWaterQuality.text = "NaN"
+                progressBarWaterQuality.progress = 0
+            }
+        }
     }
 
     private fun initTemperatureViews() {
@@ -51,7 +95,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun initWaterLevelViews() {
         progressBarWaterLevel = findViewById(R.id.circularProgressBarWaterLevel)
-        percentageTextViewWaterLevel = findViewById(R.id.percentageTextViewWaterLevel)
+        textViewWaterLevel = findViewById(R.id.TextViewWaterLevel)
+    }
+
+    private fun initWaterQualityViews() {
+        progressBarWaterQuality = findViewById(R.id.circularProgressBarWaterQuality)
+        textViewWaterQuality = findViewById(R.id.TextViewWaterQuality)
     }
 
     @SuppressLint("SetTextI18n")
@@ -62,15 +111,15 @@ class MainActivity : AppCompatActivity() {
                 val averageTemperature = temperatures.average()
                 Log.d("MainActivity", "Temperatura promedio: $averageTemperature")
 
-                // Mostrar el valor promedio, una barra invertida y luego la temperatura máxima en el TextView
+                // Show the average value, a backslash and then the maximum temperature in the TextView
                 percentageTextViewWaterTemperature.text = "${averageTemperature.toInt()}ºC / ${maxTemperature.toInt()}ºC"
 
-                // Calcular el porcentaje y actualizar el progreso del ProgressBar
+                // Calculate percentage and update progressBar
                 val progressBarPercentage = ((averageTemperature * 100) / maxTemperature).toInt()
                 Log.d("MainActivity", "Porcentaje temperatura: $progressBarPercentage")
                 progressBarWaterTemperature.progress = progressBarPercentage
             } else {
-                Log.d("MainActivity", "No hay datos de temperatura disponibles")
+                Log.d("MainActivity", "No temperature data available")
                 percentageTextViewWaterTemperature.text = "NaN"
                 progressBarWaterTemperature.progress = 0
             }
@@ -79,24 +128,42 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun updateWaterLevelValues() {
-        // Obtener la temperatura máxima y establecerla en el TextView correspondiente
         firebaseDatabaseInterface.getWaterLevels { waterLevel ->
             if (waterLevel.isNotEmpty()) {
-                val averageWaterLevel = waterLevel.average()
+                val averageWaterLevel = waterLevel.average() // Get average using water levels
                 Log.d("MainActivity", "Nivel promedio agua: $averageWaterLevel")
 
-                // Mostrar el valor promedio, una barra invertida y luego la temperatura máxima en el TextView
-                percentageTextViewWaterLevel.text = "Nivel de agua ${averageWaterLevel.toInt()} / ${maxWaterLevel.toInt()}"
-
-                // Calcular el porcentaje y actualizar el progreso del ProgressBar
+                // Calculate percentage and update progressBar
                 val progressBarPercentageWater = ((averageWaterLevel * 100) / maxWaterLevel).toInt()
                 Log.d("MainActivity", "Porcentaje water level: $progressBarPercentageWater")
                 progressBarWaterLevel.progress = progressBarPercentageWater
+
+                val waterLevelMessage = when {
+                    progressBarPercentageWater < 34 -> "Nivel de agua: ok"
+                    progressBarPercentageWater < 68 -> "Nivel de agua: estable"
+                    else -> "Rellenar bebedero"
+                }
+                textViewWaterLevel.text = waterLevelMessage
+
             } else {
-                Log.d("MainActivity", "No hay datos de temperatura disponibles")
-                percentageTextViewWaterLevel.text = "NaN"
+                Log.d("MainActivity", "No water level data available")
+                textViewWaterLevel.text = "NaN"
                 progressBarWaterLevel.progress = 0
             }
         }
+    }
+
+    private fun updateWaterQuality() {
+        // Calculate percentage and update progressBar
+        val progressBarWaterQualityValue = ((waterQuality * 100) / maxDaysWithoutFill)
+        Log.d("MainActivity", "Porcentaje water quality: $progressBarWaterQualityValue")
+        progressBarWaterQuality.progress = progressBarWaterQualityValue
+
+        val waterQualityMessage = when {
+            waterQuality < medDaysWithoutFill  -> "Calidad del agua: buena"
+            waterQuality < maxDaysWithoutFill -> "Calidad del agua: media"
+            else -> "Cambiar agua del bebedero"
+        }
+        textViewWaterQuality.text = waterQualityMessage.toString()
     }
 }

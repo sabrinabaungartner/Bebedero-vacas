@@ -8,7 +8,7 @@
     tools:context=".MainActivity"
     android:background="@drawable/background">
 
-    <!-- background with semi gray -->
+    <!-- Background with semi gray -->
     <View
         android:id="@+id/view"
         android:layout_width="match_parent"
@@ -19,9 +19,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Include circle style and ProgressBar style for first circularBackground -->
+    <!-- Include circle style and ProgressBar style for max and average temperature -->
     <RelativeLayout
-        android:id="@+id/circularBackground1"
+        android:id="@+id/circularBackgroundTemperature"
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_marginTop="32dp"
@@ -31,6 +31,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" >
 
+        <!-- ProgressBar to show percentage between average and maximum temperature -->
         <ProgressBar
             android:id="@+id/circularProgressBarWaterTemperature"
             style="?android:attr/progressBarStyleHorizontal"
@@ -42,7 +43,7 @@
             android:layout_centerInParent="true"
             android:progressDrawable="@drawable/circular_progress_drawable" />
 
-        <!-- TextView para mostrar el valor promedio y la temperatura máxima -->
+        <!-- TextView to show average value and maximum temperature -->
         <TextView
             android:id="@+id/percentageTextViewWaterTemperature"
             android:layout_width="wrap_content"
@@ -54,15 +55,15 @@
             android:textStyle="bold" />
     </RelativeLayout>
 
-    <!-- Include circle style and ProgressBar style for second circularBackground -->
+    <!-- Include circle style and ProgressBar style for water level -->
     <RelativeLayout
-        android:id="@+id/circularBackground2"
+        android:id="@+id/circularBackgroundWater"
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_marginTop="32dp"
         android:background="@drawable/circular_background"
         android:elevation="20dp"
-        app:layout_constraintTop_toBottomOf="@id/circularBackground1"
+        app:layout_constraintTop_toBottomOf="@id/circularBackgroundTemperature"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" >
 
@@ -72,21 +73,57 @@
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_centerInParent="true"
             android:indeterminate="false"
             android:max="100"
             android:progress="0"
-            android:layout_centerInParent="true"
             android:progressDrawable="@drawable/circular_progress_drawable" />
 
-        <!-- TextView para mostrar el valor promedio y la temperatura máxima -->
+        <!-- TextView to show water level status -->
         <TextView
-            android:id="@+id/percentageTextViewWaterLevel"
+            android:id="@+id/TextViewWaterLevel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:gravity="center"
             android:textColor="#FFFFFF"
-            android:textSize="26sp"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <!-- Include circle style and ProgressBar style for water quality -->
+    <RelativeLayout
+        android:id="@+id/circularBackgroundWaterQuality"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/circular_background"
+        android:elevation="20dp"
+        app:layout_constraintTop_toBottomOf="@id/circularBackgroundWater"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" >
+
+        <!-- ProgressBar circular water level -->
+        <ProgressBar
+            android:id="@+id/circularProgressBarWaterQuality"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:indeterminate="false"
+            android:max="100"
+            android:progress="0"
+            android:progressDrawable="@drawable/circular_progress_drawable" />
+
+        <!-- TextView to show water level status -->
+        <TextView
+            android:id="@+id/TextViewWaterQuality"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:textColor="#FFFFFF"
+            android:textSize="22sp"
             android:textStyle="bold" />
     </RelativeLayout>
 
