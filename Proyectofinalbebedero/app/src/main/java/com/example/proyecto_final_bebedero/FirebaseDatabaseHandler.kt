@@ -1,6 +1,5 @@
 package com.example.proyecto_final_bebedero
 
-import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -115,18 +114,18 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
         // Agregar el listener para los datos de backup
         backupsRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val level_values = mutableListOf<Double>()
+                val levelValues = mutableListOf<Double>()
 
                 // Iterar sobre cada backup
                 for (backupSnapshot in dataSnapshot.children) {
-                    val level = backupSnapshot.child("temperatura_agua").getValue(Double::class.java)
+                    val level = backupSnapshot.child("nivel_agua").getValue(Double::class.java)
                     // Verificar si la temperatura está disponible en el backup
                     if (level != null) {
-                        level_values.add(level)
+                        levelValues.add(level)
                     }
                 }
 
-                listener(level_values) // Llamar al callback con la lista de temperaturas obtenidas
+                listener(levelValues) // Llamar al callback con la lista de temperaturas obtenidas
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
