@@ -108,4 +108,46 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
             }
         })
     }
+
+    override fun getWaterLevels(listener: (List<Double>) -> Unit) {
+        val backupsRef = mDatabase.child("datos_backup") // get reference to backup values
+
+        // Agregar el listener para los datos de backup
+        backupsRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val level_values = mutableListOf<Double>()
+
+                // Iterar sobre cada backup
+                for (backupSnapshot in dataSnapshot.children) {
+                    val level = backupSnapshot.child("temperatura_agua").getValue(Double::class.java)
+                    // Verificar si la temperatura está disponible en el backup
+                    if (level != null) {
+                        level_values.add(level)
+                    }
+                }
+
+                listener(level_values) // Llamar al callback con la lista de temperaturas obtenidas
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Manejar el error, si es necesario
+            }
+        })
+    }
+
+    override fun getMaxWaterLevel(listener: (Double) -> Unit) {
+        val maxWaterLevelRef = mDatabase.child("parametros").child("nivel_agua") //Ref maxWaterLevel
+
+        // listener max water level
+        maxWaterLevelRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val maxWaterLevel = dataSnapshot.getValue(Double::class.java) ?: 0.0 // get max water level
+                listener(maxWaterLevel) // call callback with value obtained
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Manejar el error, si es necesario
+            }
+        })
+    }
 }

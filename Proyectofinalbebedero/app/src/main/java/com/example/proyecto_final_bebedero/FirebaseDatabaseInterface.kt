@@ -9,4 +9,8 @@ interface FirebaseDatabaseInterface {
     fun getMaxWaterTemperature(listener: (Double) -> Unit) //listener lambda function
 
     fun getWaterTemperatures(listener: (List<Double>) -> Unit) //listener lambda function
+
+    fun getMaxWaterLevel(listener: (Double) -> Unit) //listener lambda function
+
+    fun getWaterLevels(listener: (List<Double>) -> Unit) //listener lambda function
 }
