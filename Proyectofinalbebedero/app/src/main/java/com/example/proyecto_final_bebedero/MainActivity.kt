@@ -14,7 +14,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var progressBarWaterTemperature: ProgressBar
     private lateinit var progressBarWaterLevel: ProgressBar
-    private lateinit var percentageTextView: TextView
+    private lateinit var percentageTextViewWaterTemperature: TextView
+    private lateinit var percentageTextViewWaterLevel: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,11 +46,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun initTemperatureViews() {
         progressBarWaterTemperature = findViewById(R.id.circularProgressBarWaterTemperature)
-        percentageTextView = findViewById(R.id.percentageTextView)
+        percentageTextViewWaterTemperature = findViewById(R.id.percentageTextViewWaterTemperature)
     }
 
     private fun initWaterLevelViews() {
         progressBarWaterLevel = findViewById(R.id.circularProgressBarWaterLevel)
+        percentageTextViewWaterLevel = findViewById(R.id.percentageTextViewWaterLevel)
     }
 
     @SuppressLint("SetTextI18n")
@@ -61,7 +63,7 @@ class MainActivity : AppCompatActivity() {
                 Log.d("MainActivity", "Temperatura promedio: $averageTemperature")
 
                 // Mostrar el valor promedio, una barra invertida y luego la temperatura máxima en el TextView
-                percentageTextView.text = "${averageTemperature.toInt()}ºC / ${maxTemperature.toInt()}ºC"
+                percentageTextViewWaterTemperature.text = "${averageTemperature.toInt()}ºC / ${maxTemperature.toInt()}ºC"
 
                 // Calcular el porcentaje y actualizar el progreso del ProgressBar
                 val progressBarPercentage = ((averageTemperature * 100) / maxTemperature).toInt()
@@ -69,7 +71,7 @@ class MainActivity : AppCompatActivity() {
                 progressBarWaterTemperature.progress = progressBarPercentage
             } else {
                 Log.d("MainActivity", "No hay datos de temperatura disponibles")
-                percentageTextView.text = "NaN"
+                percentageTextViewWaterTemperature.text = "NaN"
                 progressBarWaterTemperature.progress = 0
             }
         }
@@ -84,7 +86,7 @@ class MainActivity : AppCompatActivity() {
                 Log.d("MainActivity", "Nivel promedio agua: $averageWaterLevel")
 
                 // Mostrar el valor promedio, una barra invertida y luego la temperatura máxima en el TextView
-                //percentageTextView.text = "${averageTemperature.toInt()}ºC / ${maxTemperature.toInt()}ºC"
+                percentageTextViewWaterLevel.text = "Nivel de agua ${averageWaterLevel.toInt()} / ${maxWaterLevel.toInt()}"
 
                 // Calcular el porcentaje y actualizar el progreso del ProgressBar
                 val progressBarPercentageWater = ((averageWaterLevel * 100) / maxWaterLevel).toInt()
@@ -92,7 +94,7 @@ class MainActivity : AppCompatActivity() {
                 progressBarWaterLevel.progress = progressBarPercentageWater
             } else {
                 Log.d("MainActivity", "No hay datos de temperatura disponibles")
-                percentageTextView.text = "NaN"
+                percentageTextViewWaterLevel.text = "NaN"
                 progressBarWaterLevel.progress = 0
             }
         }

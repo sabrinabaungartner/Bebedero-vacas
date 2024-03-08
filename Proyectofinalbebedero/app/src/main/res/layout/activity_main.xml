@@ -44,7 +44,7 @@
 
         <!-- TextView para mostrar el valor promedio y la temperatura máxima -->
         <TextView
-            android:id="@+id/percentageTextView"
+            android:id="@+id/percentageTextViewWaterTemperature"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
@@ -78,6 +78,16 @@
             android:layout_centerInParent="true"
             android:progressDrawable="@drawable/circular_progress_drawable" />
 
+        <!-- TextView para mostrar el valor promedio y la temperatura máxima -->
+        <TextView
+            android:id="@+id/percentageTextViewWaterLevel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:textColor="#FFFFFF"
+            android:textSize="26sp"
+            android:textStyle="bold" />
     </RelativeLayout>
 
     <!-- Top bar with text -->
