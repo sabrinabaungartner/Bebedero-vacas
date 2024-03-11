@@ -3,9 +3,14 @@ package com.example.proyecto_final_bebedero
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
+import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.drawerlayout.widget.DrawerLayout
+import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity() {
     private val firebaseDatabaseInterface: FirebaseDatabaseInterface = FirebaseDatabaseHandler()
@@ -24,9 +29,51 @@ class MainActivity : AppCompatActivity() {
     private lateinit var textViewWaterLevel: TextView
     private lateinit var textViewWaterQuality: TextView
 
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var navView: NavigationView
+    private lateinit var menuButton: ImageButton
+
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        drawerLayout = findViewById(R.id.drawer_layout)
+        navView = findViewById(R.id.nav_view)
+        menuButton = findViewById(R.id.menuButton)
+
+        // Configurar el ActionBarDrawerToggle para sincronizar el DrawerLayout y el ActionBar
+        //val toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+        //drawerLayout.addDrawerListener(toggle)
+        //toggle.syncState()
+
+        // Deshabilitar el deslizamiento del cajón de navegación
+        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_menu) // Navigation drawer icon
+
+        // Manejar clics en el botón para abrir el cajón de navegación
+        menuButton.setOnClickListener {
+            if (drawerLayout.isDrawerOpen(navView)) {
+                drawerLayout.closeDrawer(navView)
+            } else {
+                drawerLayout.openDrawer(navView)
+            }
+        }
+
+        // Manejar clics en los elementos del menú de navegación
+        navView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.nav_home -> {
+                    // Manejar la acción correspondiente al elemento del menú "Inicio"
+                    // Por ejemplo, puedes abrir otra actividad o realizar alguna acción específica
+                    true
+                }
+                // Agregar otros casos según sea necesario para manejar otros elementos del menú
+                else -> false
+            }
+        }
 
         initTemperatureViews()
         initWaterLevelViews()
@@ -165,5 +212,17 @@ class MainActivity : AppCompatActivity() {
             else -> "Cambiar agua del bebedero"
         }
         textViewWaterQuality.text = waterQualityMessage.toString()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            if (drawerLayout.isDrawerOpen(navView)) {
+                drawerLayout.closeDrawer(navView)
+            } else {
+                drawerLayout.openDrawer(navView)
+            }
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 }
