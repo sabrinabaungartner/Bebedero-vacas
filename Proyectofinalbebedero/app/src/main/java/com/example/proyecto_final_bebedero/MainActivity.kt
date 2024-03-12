@@ -25,9 +25,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var progressBarWaterLevel: ProgressBar
     private lateinit var progressBarWaterQuality: ProgressBar
 
+    private lateinit var textViewWaterTemperature: TextView
     private lateinit var percentageTextViewWaterTemperature: TextView
     private lateinit var textViewWaterLevel: TextView
+    private lateinit var percentageTextViewWaterLevel: TextView
     private lateinit var textViewWaterQuality: TextView
+    private lateinit var percentageTextViewWaterQuality: TextView
 
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navView: NavigationView
@@ -36,50 +39,15 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setupMainView()
 
-        drawerLayout = findViewById(R.id.drawer_layout)
-        navView = findViewById(R.id.nav_view)
-        menuButton = findViewById(R.id.menuButton)
-
-        // Configurar el ActionBarDrawerToggle para sincronizar el DrawerLayout y el ActionBar
-        //val toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
-        //drawerLayout.addDrawerListener(toggle)
-        //toggle.syncState()
-
-        // Deshabilitar el deslizamiento del cajón de navegación
-        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_menu) // Navigation drawer icon
-
-        // Manejar clics en el botón para abrir el cajón de navegación
-        menuButton.setOnClickListener {
-            if (drawerLayout.isDrawerOpen(navView)) {
-                drawerLayout.closeDrawer(navView)
-            } else {
-                drawerLayout.openDrawer(navView)
-            }
-        }
-
-        // Manejar clics en los elementos del menú de navegación
-        navView.setNavigationItemSelectedListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.nav_home -> {
-                    // Manejar la acción correspondiente al elemento del menú "Inicio"
-                    // Por ejemplo, puedes abrir otra actividad o realizar alguna acción específica
-                    true
-                }
-                // Agregar otros casos según sea necesario para manejar otros elementos del menú
-                else -> false
-            }
-        }
+        navigationDrawerSetup()
 
         initTemperatureViews()
         initWaterLevelViews()
         initWaterQualityViews()
 
-        // Escuchar cambios en los valores de la base de datos y actualizar la interfaz de usuario
+        // Listen for changes to database values and update the user interface
         firebaseDatabaseInterface.getMaxWaterTemperature { temperature ->
             maxTemperature = temperature
             updateWaterTemperatureValues()
@@ -135,36 +103,75 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupMainView() {
+        setContentView(R.layout.activity_main)
+        drawerLayout = findViewById(R.id.drawer_layout)
+        navView = findViewById(R.id.nav_view)
+        menuButton = findViewById(R.id.menuButton)
+    }
+
+    private fun navigationDrawerSetup() {
+        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED) // Disable navigation drawer sliding
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_menu) // Navigation drawer icon
+
+        // Open navigation drawer
+        menuButton.setOnClickListener {
+            if (drawerLayout.isDrawerOpen(navView)) {
+                drawerLayout.closeDrawer(navView)
+            } else {
+                drawerLayout.openDrawer(navView)
+            }
+        }
+
+        // Open navigation drawer elements
+        navView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.nav_home -> {
+                    // Manejar la acción correspondiente al elemento del menú "Inicio"
+                    // Por ejemplo, puedes abrir otra actividad o realizar alguna acción específica
+                    true
+                }
+                // Agregar otros casos según sea necesario para manejar otros elementos del menú
+                else -> false
+            }
+        }
+    }
+
     private fun initTemperatureViews() {
         progressBarWaterTemperature = findViewById(R.id.circularProgressBarWaterTemperature)
+        textViewWaterTemperature = findViewById(R.id.textViewWaterTemperature)
         percentageTextViewWaterTemperature = findViewById(R.id.percentageTextViewWaterTemperature)
     }
 
     private fun initWaterLevelViews() {
         progressBarWaterLevel = findViewById(R.id.circularProgressBarWaterLevel)
         textViewWaterLevel = findViewById(R.id.TextViewWaterLevel)
+        percentageTextViewWaterLevel = findViewById(R.id.percentageTextViewWaterLevel)
     }
 
     private fun initWaterQualityViews() {
         progressBarWaterQuality = findViewById(R.id.circularProgressBarWaterQuality)
         textViewWaterQuality = findViewById(R.id.TextViewWaterQuality)
+        percentageTextViewWaterQuality = findViewById(R.id.percentageTextViewWaterQuality)
     }
 
     @SuppressLint("SetTextI18n")
     private fun updateWaterTemperatureValues() {
-        // Obtener la temperatura máxima y establecerla en el TextView correspondiente
         firebaseDatabaseInterface.getWaterTemperatures { temperatures ->
             if (temperatures.isNotEmpty()) {
                 val averageTemperature = temperatures.average()
                 Log.d("MainActivity", "Temperatura promedio: $averageTemperature")
 
                 // Show the average value, a backslash and then the maximum temperature in the TextView
-                percentageTextViewWaterTemperature.text = "${averageTemperature.toInt()}ºC / ${maxTemperature.toInt()}ºC"
+                textViewWaterTemperature.text = "${averageTemperature.toInt()}ºC / ${maxTemperature.toInt()}ºC"
 
                 // Calculate percentage and update progressBar
                 val progressBarPercentage = ((averageTemperature * 100) / maxTemperature).toInt()
                 Log.d("MainActivity", "Porcentaje temperatura: $progressBarPercentage")
                 progressBarWaterTemperature.progress = progressBarPercentage
+                percentageTextViewWaterTemperature.text = "${progressBarPercentage}%"
             } else {
                 Log.d("MainActivity", "No temperature data available")
                 percentageTextViewWaterTemperature.text = "NaN"
@@ -184,6 +191,7 @@ class MainActivity : AppCompatActivity() {
                 val progressBarPercentageWater = ((averageWaterLevel * 100) / maxWaterLevel).toInt()
                 Log.d("MainActivity", "Porcentaje water level: $progressBarPercentageWater")
                 progressBarWaterLevel.progress = progressBarPercentageWater
+                percentageTextViewWaterLevel.text = "${progressBarPercentageWater}%"
 
                 val waterLevelMessage = when {
                     progressBarPercentageWater < 34 -> "Nivel de agua: ok"
@@ -200,18 +208,20 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun updateWaterQuality() {
         // Calculate percentage and update progressBar
         val progressBarWaterQualityValue = ((waterQuality * 100) / maxDaysWithoutFill)
         Log.d("MainActivity", "Porcentaje water quality: $progressBarWaterQualityValue")
         progressBarWaterQuality.progress = progressBarWaterQualityValue
+        percentageTextViewWaterQuality.text = "${progressBarWaterQualityValue}%"
 
         val waterQualityMessage = when {
             waterQuality < medDaysWithoutFill  -> "Calidad del agua: buena"
             waterQuality < maxDaysWithoutFill -> "Calidad del agua: media"
             else -> "Cambiar agua del bebedero"
         }
-        textViewWaterQuality.text = waterQualityMessage.toString()
+        textViewWaterQuality.text = waterQualityMessage
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

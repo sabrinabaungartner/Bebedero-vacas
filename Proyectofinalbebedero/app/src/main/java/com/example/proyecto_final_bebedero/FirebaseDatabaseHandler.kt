@@ -13,11 +13,11 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
     override fun getMaxWaterTemperature(listener: (Double) -> Unit) {
         val maxWaterTemperatureRef = mDatabase.child("parametros").child("temperatura_maxima") // Get max temperature reference
 
-        // Agregar el listener para la temperatura máxima
+        // Listen to changes in max water temperature value
         maxWaterTemperatureRef.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val maxWaterTemperature = dataSnapshot.getValue(Double::class.java) ?: 0.0 // Get max temperature value
-                listener(maxWaterTemperature) // Callback with obtained value
+            override fun onDataChange(dataSnapshot: DataSnapshot) { // New change in value
+                val maxWaterTemperature = dataSnapshot.getValue(Double::class.java) ?: 0.0 // Get new max temperature value
+                listener(maxWaterTemperature) // Callback listener with new obtained value
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
@@ -33,11 +33,9 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val temperatures = mutableListOf<Double>()
 
-                // Iterar sobre cada backup
-                for (backupSnapshot in dataSnapshot.children) {
+                for (backupSnapshot in dataSnapshot.children) { // Iterate over each backup
                     val temperature = backupSnapshot.child("temperatura_agua").getValue(Double::class.java)
-                    // Verificar si la temperatura está disponible en el backup
-                    if (temperature != null) {
+                    if (temperature != null) { // Check if the temperature is available in the backup
                         temperatures.add(temperature)
                     }
                 }

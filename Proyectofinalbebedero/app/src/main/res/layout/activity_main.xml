@@ -7,107 +7,179 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
-    android:background="@drawable/background">
+    android:background="#FFFFFF">
 
     <!-- main content -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <!-- android:background="#80000000" -->
         <!-- Background with semi gray -->
         <View
             android:id="@+id/view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#80000000"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Include circle style and ProgressBar style for max and average temperature -->
-        <RelativeLayout
-            android:id="@+id/circularBackgroundTemperature"
-            android:layout_width="150dp"
+
+
+
+        <!-- CardView for temperature level circle -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardViewTemperature"
+            app:cardBackgroundColor="#7681f0"
+            android:layout_width="350dp"
             android:layout_height="150dp"
-            android:layout_marginTop="32dp"
-            android:background="@drawable/circular_background"
-            android:elevation="20dp"
+            android:layout_marginTop="25dp"
+            app:cardCornerRadius="30dp"
+            app:cardElevation="10dp"
             app:layout_constraintTop_toBottomOf="@id/myView"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" >
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/cardViewWaterLevel">
 
-            <!-- ProgressBar to show percentage between average and maximum temperature -->
-            <ProgressBar
-                android:id="@+id/circularProgressBarWaterTemperature"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_centerInParent="true"
-                android:indeterminate="false"
-                android:max="100"
-                android:progress="0"
-                android:progressDrawable="@drawable/circular_progress_drawable" />
+            <!-- Include circle style and ProgressBar style for max and average temperature -->
+            <RelativeLayout
+                android:id="@+id/circularBackgroundTemperature"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="15dp"
+                android:background="@drawable/circular_background"
+                android:elevation="20dp"
+                android:layout_gravity="end"
+                android:gravity="center">
+
+                <!-- ProgressBar to show percentage between average and maximum temperature -->
+                <ProgressBar
+                    android:id="@+id/circularProgressBarWaterTemperature"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_centerInParent="true"
+                    android:indeterminate="false"
+                    android:max="100"
+                    android:progress="0"
+                    android:progressDrawable="@drawable/circular_progress_drawable" />
+
+                <!-- TextView to show percentage -->
+                <TextView
+                    android:id="@+id/percentageTextViewWaterTemperature"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:textColor="#FFFFFF"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </RelativeLayout>
 
             <!-- TextView to show average value and maximum temperature -->
             <TextView
-                android:id="@+id/percentageTextViewWaterTemperature"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:gravity="center"
-                android:textColor="#FFFFFF"
-                android:textSize="26sp"
-                android:textStyle="bold" />
-        </RelativeLayout>
-
-        <!-- Include circle style and ProgressBar style for water level -->
-        <RelativeLayout
-            android:id="@+id/circularBackgroundWater"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_marginTop="32dp"
-            android:background="@drawable/circular_background"
-            android:elevation="20dp"
-            app:layout_constraintTop_toBottomOf="@id/circularBackgroundTemperature"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" >
-
-            <!-- ProgressBar circular water level -->
-            <ProgressBar
-                android:id="@+id/circularProgressBarWaterLevel"
-                style="?android:attr/progressBarStyleHorizontal"
+                android:id="@+id/textViewWaterTemperature"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_centerInParent="true"
-                android:indeterminate="false"
-                android:max="100"
-                android:progress="0"
-                android:progressDrawable="@drawable/circular_progress_drawable" />
+                android:gravity="center"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="150dp"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+        </androidx.cardview.widget.CardView>
+
+        <!-- CardView for water level circle -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardViewWaterLevel"
+            app:cardBackgroundColor="#7681f0"
+            android:layout_width="350dp"
+            android:layout_height="150dp"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="30dp"
+            app:cardElevation="10dp"
+            app:layout_constraintTop_toBottomOf="@id/cardViewTemperature"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/cardViewWaterQuality">
+
+            <!-- Include circle style and ProgressBar style for water level -->
+            <RelativeLayout
+                android:id="@+id/circularBackgroundWater"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="15dp"
+                android:background="@drawable/circular_background"
+                android:elevation="20dp"
+                android:layout_gravity="end"
+                android:gravity="center">
+
+                <!-- ProgressBar circular water level -->
+                <ProgressBar
+                    android:id="@+id/circularProgressBarWaterLevel"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_centerInParent="true"
+                    android:indeterminate="false"
+                    android:max="100"
+                    android:progress="0"
+                    android:progressDrawable="@drawable/circular_progress_drawable" />
+
+                <!-- TextView to show percentage -->
+                <TextView
+                    android:id="@+id/percentageTextViewWaterLevel"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:textColor="#FFFFFF"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </RelativeLayout>
 
             <!-- TextView to show water level status -->
             <TextView
                 android:id="@+id/TextViewWaterLevel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="150dp"
                 android:gravity="center"
+                android:layout_marginStart="10dp"
                 android:textColor="#FFFFFF"
                 android:textSize="22sp"
                 android:textStyle="bold" />
-        </RelativeLayout>
+
+        </androidx.cardview.widget.CardView>
+
+
+
+
+    <!-- CardView for water level circle -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardViewWaterQuality"
+        app:cardBackgroundColor="#7681f0"
+        android:layout_width="350dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="16dp"
+        app:cardCornerRadius="30dp"
+        app:cardElevation="10dp"
+        app:layout_constraintTop_toBottomOf="@id/cardViewWaterLevel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <!-- Include circle style and ProgressBar style for water quality -->
         <RelativeLayout
-            android:id="@+id/circularBackgroundWaterQuality"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_marginTop="32dp"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="15dp"
             android:background="@drawable/circular_background"
             android:elevation="20dp"
-            app:layout_constraintTop_toBottomOf="@id/circularBackgroundWater"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" >
+            android:layout_gravity="end"
+            android:gravity="center">
 
             <!-- ProgressBar circular water level -->
             <ProgressBar
@@ -121,40 +193,55 @@
                 android:progress="0"
                 android:progressDrawable="@drawable/circular_progress_drawable" />
 
-            <!-- TextView to show water level status -->
+            <!-- TextView to show percentage -->
             <TextView
-                android:id="@+id/TextViewWaterQuality"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
+                android:id="@+id/percentageTextViewWaterQuality"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:gravity="center"
                 android:textColor="#FFFFFF"
-                android:textSize="22sp"
+                android:textSize="20sp"
                 android:textStyle="bold" />
         </RelativeLayout>
+
+        <!-- TextView to show water level status -->
+        <TextView
+            android:id="@+id/TextViewWaterQuality"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="150dp"
+            android:gravity="center"
+            android:layout_marginStart="10dp"
+            android:textColor="#FFFFFF"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+    </androidx.cardview.widget.CardView>
 
         <!-- Top bar with text -->
         <View
             android:id="@+id/myView"
             android:layout_width="wrap_content"
-            android:layout_height="90dp"
-            android:background="#6441A5"
+            android:layout_height="200dp"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            android:background="@drawable/background2" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Bienvenidos a la App del bebedero"
-            android:textColor="#FFFFFF"
             android:layout_gravity="center"
             android:gravity="center"
-            app:layout_constraintTop_toTopOf="@id/myView"
-            app:layout_constraintStart_toStartOf="@id/myView"
-            app:layout_constraintEnd_toEndOf="@id/myView"
-            app:layout_constraintBottom_toBottomOf="@id/myView"
-            android:typeface="serif"
+            android:text="Bienvenidos a la App del bebedero"
+            android:textColor="#FFFFFF"
             android:textSize="26sp"
+            android:typeface="serif"
+            app:layout_constraintBottom_toBottomOf="@id/myView"
+            app:layout_constraintEnd_toEndOf="@id/myView"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@id/myView"
+            app:layout_constraintTop_toTopOf="@id/myView"
+            app:layout_constraintVertical_bias="0.117"
             tools:ignore="HardcodedText" />
 
         <ImageButton
@@ -171,7 +258,7 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Cajón de navegación -->
+    <!-- Navigation drawer -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"
         android:layout_width="wrap_content"

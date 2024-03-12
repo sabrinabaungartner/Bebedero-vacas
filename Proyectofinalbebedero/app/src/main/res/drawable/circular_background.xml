@@ -2,7 +2,7 @@
     <!-- Círculo exterior (fondo) -->
     <item>
         <shape android:shape="oval">
-            <solid android:color="#70808080" />
+            <solid android:color="@android:color/transparent" />
         </shape>
     </item>
     <!-- Círculo interior (borde) -->
