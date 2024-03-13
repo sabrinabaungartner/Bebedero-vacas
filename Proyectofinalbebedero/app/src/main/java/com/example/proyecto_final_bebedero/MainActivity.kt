@@ -1,19 +1,31 @@
 package com.example.proyecto_final_bebedero
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity() {
     private val firebaseDatabaseInterface: FirebaseDatabaseInterface = FirebaseDatabaseHandler()
+    private lateinit var notificationHandler: PushNotificationsInterface
+
     private var maxTemperature: Double = 0.0
     private var maxWaterLevel: Double = 0.0
     private var waterQuality: Int = 1
@@ -39,6 +51,7 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setupMainView()
 
         navigationDrawerSetup()
@@ -46,6 +59,9 @@ class MainActivity : AppCompatActivity() {
         initTemperatureViews()
         initWaterLevelViews()
         initWaterQualityViews()
+
+        notificationHandler = PushNotificationsHandler(this) // Initialize the notification handler
+        notificationHandler.createNotificationChannel("Bebedero", "Notificaciones de la app bebedero") // Create notification channel when the activity is created
 
         // Listen for changes to database values and update the user interface
         firebaseDatabaseInterface.getMaxWaterTemperature { temperature ->
@@ -172,6 +188,10 @@ class MainActivity : AppCompatActivity() {
                 Log.d("MainActivity", "Porcentaje temperatura: $progressBarPercentage")
                 progressBarWaterTemperature.progress = progressBarPercentage
                 percentageTextViewWaterTemperature.text = "${progressBarPercentage}%"
+
+                if (progressBarPercentage >= 90) {
+                    notificationHandler.showNotification("TEMPERATURA BEBEDERO", "La temperatura supera la máxima permitida")
+                }
             } else {
                 Log.d("MainActivity", "No temperature data available")
                 percentageTextViewWaterTemperature.text = "NaN"
