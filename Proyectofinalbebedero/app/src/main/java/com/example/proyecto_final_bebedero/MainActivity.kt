@@ -1,24 +1,14 @@
 package com.example.proyecto_final_bebedero
 
-import android.Manifest
 import android.annotation.SuppressLint
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.content.Context
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
-import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
+import androidx.cardview.widget.CardView
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.navigation.NavigationView
 
@@ -33,22 +23,28 @@ class MainActivity : AppCompatActivity() {
     private var medDaysWithoutFill = 1
     private val qualityLectureError = 99
 
+    // Vars for water temperature
+    private lateinit var waterTemperatureView: CardView
     private lateinit var progressBarWaterTemperature: ProgressBar
-    private lateinit var progressBarWaterLevel: ProgressBar
-    private lateinit var progressBarWaterQuality: ProgressBar
-
+    private lateinit var progressBarWaterTemperatureText: TextView
     private lateinit var textViewWaterTemperature: TextView
-    private lateinit var percentageTextViewWaterTemperature: TextView
+
+    // Vars for water level
+    private lateinit var waterLevelView: CardView
+    private lateinit var progressBarWaterLevel: ProgressBar
+    private lateinit var progressBarWaterLevelText: TextView
     private lateinit var textViewWaterLevel: TextView
-    private lateinit var percentageTextViewWaterLevel: TextView
+
+    // Vars for water quality
+    private lateinit var waterQualityView: CardView
+    private lateinit var progressBarWaterQuality: ProgressBar
+    private lateinit var progressBarWaterQualityText: TextView
     private lateinit var textViewWaterQuality: TextView
-    private lateinit var percentageTextViewWaterQuality: TextView
 
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navView: NavigationView
     private lateinit var menuButton: ImageButton
 
-    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -56,7 +52,7 @@ class MainActivity : AppCompatActivity() {
 
         navigationDrawerSetup()
 
-        initTemperatureViews()
+        initWaterTemperatureViews()
         initWaterLevelViews()
         initWaterQualityViews()
 
@@ -88,9 +84,7 @@ class MainActivity : AppCompatActivity() {
                 updateWaterQuality()
             }
             else {
-                Log.d("MainActivity", "No water quality data available")
-                textViewWaterQuality.text = "NaN"
-                progressBarWaterQuality.progress = 0
+                showErrorWaterQualityData()
             }
         }
 
@@ -100,9 +94,7 @@ class MainActivity : AppCompatActivity() {
                 updateWaterQuality()
             }
             else {
-                Log.d("MainActivity", "No water max quality data available")
-                textViewWaterQuality.text = "NaN"
-                progressBarWaterQuality.progress = 0
+                showErrorWaterQualityData()
             }
         }
 
@@ -112,9 +104,7 @@ class MainActivity : AppCompatActivity() {
                 updateWaterQuality()
             }
             else {
-                Log.d("MainActivity", "No water med quality data available")
-                textViewWaterQuality.text = "NaN"
-                progressBarWaterQuality.progress = 0
+                showErrorWaterQualityData()
             }
         }
     }
@@ -155,22 +145,25 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun initTemperatureViews() {
-        progressBarWaterTemperature = findViewById(R.id.circularProgressBarWaterTemperature)
+    private fun initWaterTemperatureViews() {
+        waterTemperatureView = findViewById(R.id.cardViewTemperature)
+        progressBarWaterTemperature = waterTemperatureView.findViewById(R.id.circularProgressBar)
+        progressBarWaterTemperatureText = waterTemperatureView.findViewById(R.id.percentageTextView)
         textViewWaterTemperature = findViewById(R.id.textViewWaterTemperature)
-        percentageTextViewWaterTemperature = findViewById(R.id.percentageTextViewWaterTemperature)
     }
 
     private fun initWaterLevelViews() {
-        progressBarWaterLevel = findViewById(R.id.circularProgressBarWaterLevel)
+        waterLevelView = findViewById(R.id.cardViewWaterLevel)
+        progressBarWaterLevel = waterLevelView.findViewById(R.id.circularProgressBar)
+        progressBarWaterLevelText = waterLevelView.findViewById(R.id.percentageTextView)
         textViewWaterLevel = findViewById(R.id.TextViewWaterLevel)
-        percentageTextViewWaterLevel = findViewById(R.id.percentageTextViewWaterLevel)
     }
 
     private fun initWaterQualityViews() {
-        progressBarWaterQuality = findViewById(R.id.circularProgressBarWaterQuality)
+        waterQualityView = findViewById(R.id.cardViewWaterQuality)
+        progressBarWaterQuality = waterQualityView.findViewById(R.id.circularProgressBar)
+        progressBarWaterQualityText = waterQualityView.findViewById(R.id.percentageTextView)
         textViewWaterQuality = findViewById(R.id.TextViewWaterQuality)
-        percentageTextViewWaterQuality = findViewById(R.id.percentageTextViewWaterQuality)
     }
 
     @SuppressLint("SetTextI18n")
@@ -187,15 +180,16 @@ class MainActivity : AppCompatActivity() {
                 val progressBarPercentage = ((averageTemperature * 100) / maxTemperature).toInt()
                 Log.d("MainActivity", "Porcentaje temperatura: $progressBarPercentage")
                 progressBarWaterTemperature.progress = progressBarPercentage
-                percentageTextViewWaterTemperature.text = "${progressBarPercentage}%"
+                progressBarWaterTemperatureText.text = "${progressBarPercentage}%"
 
                 if (progressBarPercentage >= 90) {
                     notificationHandler.showNotification("TEMPERATURA BEBEDERO", "La temperatura supera la máxima permitida")
                 }
             } else {
                 Log.d("MainActivity", "No temperature data available")
-                percentageTextViewWaterTemperature.text = "NaN"
+                progressBarWaterTemperatureText.text = "NaN"
                 progressBarWaterTemperature.progress = 0
+                textViewWaterTemperature.text = "Datos de temperatura no disponibles"
             }
         }
     }
@@ -211,10 +205,10 @@ class MainActivity : AppCompatActivity() {
                 val progressBarPercentageWater = ((averageWaterLevel * 100) / maxWaterLevel).toInt()
                 Log.d("MainActivity", "Porcentaje water level: $progressBarPercentageWater")
                 progressBarWaterLevel.progress = progressBarPercentageWater
-                percentageTextViewWaterLevel.text = "${progressBarPercentageWater}%"
+                progressBarWaterLevelText.text = "${progressBarPercentageWater}%"
 
                 val waterLevelMessage = when {
-                    progressBarPercentageWater < 34 -> "Nivel de agua: ok"
+                    progressBarPercentageWater < 34 -> "Nivel de agua: excelente"
                     progressBarPercentageWater < 68 -> "Nivel de agua: estable"
                     else -> "Rellenar bebedero"
                 }
@@ -222,8 +216,9 @@ class MainActivity : AppCompatActivity() {
 
             } else {
                 Log.d("MainActivity", "No water level data available")
-                textViewWaterLevel.text = "NaN"
+                textViewWaterLevel.text = "Datos del nivel de agua no disponibles"
                 progressBarWaterLevel.progress = 0
+                progressBarWaterLevelText.text = "Nan"
             }
         }
     }
@@ -234,7 +229,7 @@ class MainActivity : AppCompatActivity() {
         val progressBarWaterQualityValue = ((waterQuality * 100) / maxDaysWithoutFill)
         Log.d("MainActivity", "Porcentaje water quality: $progressBarWaterQualityValue")
         progressBarWaterQuality.progress = progressBarWaterQualityValue
-        percentageTextViewWaterQuality.text = "${progressBarWaterQualityValue}%"
+        progressBarWaterQualityText.text = "${progressBarWaterQualityValue}%"
 
         val waterQualityMessage = when {
             waterQuality < medDaysWithoutFill  -> "Calidad del agua: buena"
@@ -254,5 +249,13 @@ class MainActivity : AppCompatActivity() {
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun showErrorWaterQualityData() {
+        Log.d("MainActivity", "No water med quality data available")
+        textViewWaterQuality.text = "No hay datos de calidad del agua disponibles"
+        progressBarWaterQuality.progress = 0
+        progressBarWaterQualityText.text = "NaN"
     }
 }

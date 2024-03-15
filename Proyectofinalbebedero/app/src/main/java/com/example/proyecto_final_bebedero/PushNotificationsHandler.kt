@@ -11,9 +11,11 @@ import androidx.core.app.NotificationManagerCompat
 
 class PushNotificationsHandler(private val context: Context): PushNotificationsInterface {
     companion object {
-        const val MY_CHANNEL_ID = "my_channel"
+        const val MY_CHANNEL_ID = "my_channel_bebedero"
         const val PERMISSION_REQUEST_NOTIFICATION = 100
     }
+
+    val GROUP_KEY_BEBEDERO = "group_app_bebedero"
 
     override fun createNotificationChannel(title: String, channelDescription: String) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -33,7 +35,12 @@ class PushNotificationsHandler(private val context: Context): PushNotificationsI
             .setContentTitle(title)
             .setContentText(textToShow)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setGroup(GROUP_KEY_BEBEDERO)
 
+        checkAndRequirePermissionsToNotify(builder)
+    }
+
+    private fun checkAndRequirePermissionsToNotify(builder: NotificationCompat.Builder) {
         if (ActivityCompat.checkSelfPermission(
                 context,
                 android.Manifest.permission.POST_NOTIFICATIONS
