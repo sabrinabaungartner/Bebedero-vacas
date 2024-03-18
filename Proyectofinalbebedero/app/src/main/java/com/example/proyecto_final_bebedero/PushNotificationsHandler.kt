@@ -13,9 +13,11 @@ class PushNotificationsHandler(private val context: Context): PushNotificationsI
     companion object {
         const val MY_CHANNEL_ID = "my_channel_bebedero"
         const val PERMISSION_REQUEST_NOTIFICATION = 100
+        const val GROUP_KEY_BEBEDERO = "group_app_bebedero"
+        const val SUMMARY_ID = 0
+        const val TEMPERATURE_ID = 1
+        const val QUALITY_ID = 2
     }
-
-    val GROUP_KEY_BEBEDERO = "group_app_bebedero"
 
     override fun createNotificationChannel(title: String, channelDescription: String) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -29,18 +31,44 @@ class PushNotificationsHandler(private val context: Context): PushNotificationsI
         }
     }
 
-    override fun showNotification(title: String, textToShow: String) {
+    override fun showNotificationTemperature(title: String, shortTextToShow: String, largeTextToShow: String) {
         val builder = NotificationCompat.Builder(context, MY_CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setContentTitle(title)
-            .setContentText(textToShow)
+            .setContentText(shortTextToShow)
+            .setStyle(NotificationCompat.BigTextStyle()
+                .bigText(largeTextToShow))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setGroup(GROUP_KEY_BEBEDERO)
 
-        checkAndRequirePermissionsToNotify(builder)
+        checkAndRequirePermissionsToNotify(TEMPERATURE_ID, builder)
     }
 
-    private fun checkAndRequirePermissionsToNotify(builder: NotificationCompat.Builder) {
+    override fun showNotificationQuality(title: String, shortTextToShow: String, largeTextToShow: String) {
+        val builder = NotificationCompat.Builder(context, MY_CHANNEL_ID)
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setContentTitle(title)
+            .setContentText(shortTextToShow)
+            .setStyle(NotificationCompat.BigTextStyle()
+                .bigText(largeTextToShow))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setGroup(GROUP_KEY_BEBEDERO)
+
+        checkAndRequirePermissionsToNotify(QUALITY_ID, builder)
+    }
+
+    override fun showSummaryNotification() {
+        val summaryNotificationBuilder = NotificationCompat.Builder(context, MY_CHANNEL_ID)
+            .setContentTitle("Resumen de notificaciones")
+            .setContentText("Varias notificaciones")
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setGroup(GROUP_KEY_BEBEDERO)
+            .setGroupSummary(true)
+
+        checkAndRequirePermissionsToNotify(SUMMARY_ID, summaryNotificationBuilder)
+    }
+
+    private fun checkAndRequirePermissionsToNotify(notificationId: Int, builder: NotificationCompat.Builder) {
         if (ActivityCompat.checkSelfPermission(
                 context,
                 android.Manifest.permission.POST_NOTIFICATIONS
@@ -53,7 +81,7 @@ class PushNotificationsHandler(private val context: Context): PushNotificationsI
             )
         } else {
             with(NotificationManagerCompat.from(context)) {
-                notify(1, builder.build())
+                notify(notificationId, builder.build())
             }
         }
     }

@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.MenuItem
 import android.widget.ImageButton
 import android.widget.ProgressBar
+import android.widget.SeekBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
@@ -15,13 +16,14 @@ import com.google.android.material.navigation.NavigationView
 class MainActivity : AppCompatActivity() {
     private val firebaseDatabaseInterface: FirebaseDatabaseInterface = FirebaseDatabaseHandler()
     private lateinit var notificationHandler: PushNotificationsInterface
+    private val GROUP_KEY_BEBEDERO = "group_app_bebedero"
 
     private var maxTemperature: Double = 0.0
     private var maxWaterLevel: Double = 0.0
     private var waterQuality: Int = 1
-    private var maxDaysWithoutFill = 1
-    private var medDaysWithoutFill = 1
-    private val qualityLectureError = 99
+    private var maxDaysWithoutFill: Int = 5
+    private var medDaysWithoutFill:Int = 2
+    private val qualityLectureError: Int = 0
 
     // Vars for water temperature
     private lateinit var waterTemperatureView: CardView
@@ -41,6 +43,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var progressBarWaterQualityText: TextView
     private lateinit var textViewWaterQuality: TextView
 
+    // SeekBars
+    private lateinit var seekBarWaterTemperature: SeekBar
+    private lateinit var progressTextViewWaterTemperature: TextView
+    private lateinit var seekBarWaterQuality: SeekBar
+    private lateinit var progressTextViewWaterQuality: TextView
+
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navView: NavigationView
     private lateinit var menuButton: ImageButton
@@ -59,54 +67,19 @@ class MainActivity : AppCompatActivity() {
         notificationHandler = PushNotificationsHandler(this) // Initialize the notification handler
         notificationHandler.createNotificationChannel("Bebedero", "Notificaciones de la app bebedero") // Create notification channel when the activity is created
 
-        // Listen for changes to database values and update the user interface
-        firebaseDatabaseInterface.getMaxWaterTemperature { temperature ->
-            maxTemperature = temperature
-            updateWaterTemperatureValues()
-        }
+        getMaxWaterTemperatureAndSetToSeekBarValue(seekBarWaterTemperature, progressTextViewWaterTemperature)
 
-        firebaseDatabaseInterface.getWaterTemperatures { _ ->
-            updateWaterTemperatureValues()
-        }
+        getWaterQualityAndSetToSeekBarValue(seekBarWaterQuality, progressTextViewWaterQuality)
 
-        firebaseDatabaseInterface.getMaxWaterLevel { waterLevel ->
-            maxWaterLevel = waterLevel
-            updateWaterLevelValues()
-        }
+        listenForChangesOnWaterTemperatureMaxAndValues()
 
-        firebaseDatabaseInterface.getWaterLevels { _ ->
-            updateWaterLevelValues()
-        }
+        listenForChangesOnWaterLevelMaxAndValues()
 
-        firebaseDatabaseInterface.getWaterQuality { quality ->
-            waterQuality = quality
-            if (waterQuality != qualityLectureError) {
-                updateWaterQuality()
-            }
-            else {
-                showErrorWaterQualityData()
-            }
-        }
+        listenForChangesOnWaterQualityValues()
 
-        firebaseDatabaseInterface.getWaterMaxDaysWithoutFill { maxDays ->
-            maxDaysWithoutFill = maxDays
-            if (maxDaysWithoutFill != qualityLectureError) {
-                updateWaterQuality()
-            }
-            else {
-                showErrorWaterQualityData()
-            }
-        }
+        listenToChangesOnSeekBarProgressWaterTemperature(seekBarWaterTemperature, progressTextViewWaterTemperature)
 
-        firebaseDatabaseInterface.getWaterMedDaysWithoutFill { medDays ->
-            medDaysWithoutFill = medDays
-            if (medDaysWithoutFill != qualityLectureError) {
-                updateWaterQuality()
-            }
-            else {
-                showErrorWaterQualityData()
-            }
-        }
+        listenToChangesOnSeekBarProgressWaterQuality(seekBarWaterQuality, progressTextViewWaterQuality)
     }
 
     private fun setupMainView() {
@@ -114,6 +87,10 @@ class MainActivity : AppCompatActivity() {
         drawerLayout = findViewById(R.id.drawer_layout)
         navView = findViewById(R.id.nav_view)
         menuButton = findViewById(R.id.menuButton)
+        seekBarWaterTemperature = findViewById(R.id.seekBarWaterTemperature) // Reference to SeekBar value
+        progressTextViewWaterTemperature = findViewById(R.id.seekBarValueTextViewWaterTemperature) // Reference to SeekBar text
+        seekBarWaterQuality = findViewById(R.id.seekBarWaterQuality)
+        progressTextViewWaterQuality = findViewById(R.id.seekBarValueTextViewQuality)
     }
 
     private fun navigationDrawerSetup() {
@@ -135,11 +112,11 @@ class MainActivity : AppCompatActivity() {
         navView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.nav_home -> {
-                    // Manejar la acción correspondiente al elemento del menú "Inicio"
-                    // Por ejemplo, puedes abrir otra actividad o realizar alguna acción específica
                     true
                 }
-                // Agregar otros casos según sea necesario para manejar otros elementos del menú
+                R.id.nav_settings -> {
+                    true
+                }
                 else -> false
             }
         }
@@ -166,6 +143,100 @@ class MainActivity : AppCompatActivity() {
         textViewWaterQuality = findViewById(R.id.TextViewWaterQuality)
     }
 
+    private fun getMaxWaterTemperatureAndSetToSeekBarValue(seekBar: SeekBar, textView: TextView) {
+        firebaseDatabaseInterface.getMaxWaterTemperature { maxTemperature ->
+            seekBar.progress = maxTemperature.toInt()
+            textView.text = maxTemperature.toInt().toString()
+        }
+    }
+
+    private fun getWaterQualityAndSetToSeekBarValue(seekBar: SeekBar, textView: TextView) {
+        firebaseDatabaseInterface.getWaterMaxDaysWithoutFill { maxDaysWithoutFill ->
+            seekBar.progress = maxDaysWithoutFill
+            textView.text = maxDaysWithoutFill.toString()
+        }
+    }
+
+    private fun listenForChangesOnWaterTemperatureMaxAndValues() {
+        firebaseDatabaseInterface.getMaxWaterTemperature { temperature ->
+            maxTemperature = temperature
+            updateWaterTemperatureValues()
+        }
+
+        firebaseDatabaseInterface.getWaterTemperatures { _ ->
+            updateWaterTemperatureValues()
+        }
+    }
+
+    private fun listenForChangesOnWaterLevelMaxAndValues() {
+        firebaseDatabaseInterface.getMaxWaterLevel { waterLevel ->
+            maxWaterLevel = waterLevel
+            updateWaterLevelValues()
+        }
+
+        firebaseDatabaseInterface.getWaterLevels { _ ->
+            updateWaterLevelValues()
+        }
+    }
+
+    private fun listenForChangesOnWaterQualityValues() {
+        firebaseDatabaseInterface.getWaterQuality { quality ->
+            waterQuality = quality
+            updateWaterQuality()
+        }
+
+        firebaseDatabaseInterface.getWaterMaxDaysWithoutFill { maxDays ->
+            maxDaysWithoutFill = maxDays
+            if (maxDaysWithoutFill != qualityLectureError) {
+                updateWaterQuality()
+            }
+            else {
+                showErrorWaterQualityData()
+            }
+        }
+
+        firebaseDatabaseInterface.getWaterMedDaysWithoutFill { medDays ->
+            medDaysWithoutFill = medDays
+            if (medDaysWithoutFill != qualityLectureError) {
+                updateWaterQuality()
+            }
+            else {
+                showErrorWaterQualityData()
+            }
+        }
+    }
+
+    private fun listenToChangesOnSeekBarProgressWaterTemperature(seekBar: SeekBar, progressTextView: TextView) {
+        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                progressTextView.text = progress.toString() // Update TextView text
+
+                firebaseDatabaseInterface.setMaxWaterTemperature(progress.toDouble()) // Update value on Firebase
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar) { } // Method required but not used
+
+            override fun onStopTrackingTouch(seekBar: SeekBar) { } // Method required but not used
+        })
+    }
+
+    private fun listenToChangesOnSeekBarProgressWaterQuality(seekBar: SeekBar, progressTextView: TextView) {
+        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                progressTextView.text = progress.toString() // Update TextView text
+
+                firebaseDatabaseInterface.setWaterMaxDaysWithoutFill(progress) // Update value on Firebase
+                val auxMedDaysWithoutFill: Int = progress/2
+                if (auxMedDaysWithoutFill == 1){firebaseDatabaseInterface.setWaterMedDaysWithoutFill(progress/2)}
+                else {firebaseDatabaseInterface.setWaterMedDaysWithoutFill(1)}
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar) { } // Method required but not used
+
+            override fun onStopTrackingTouch(seekBar: SeekBar) { } // Method required but not used
+        })
+    }
+
     @SuppressLint("SetTextI18n")
     private fun updateWaterTemperatureValues() {
         firebaseDatabaseInterface.getWaterTemperatures { temperatures ->
@@ -183,7 +254,8 @@ class MainActivity : AppCompatActivity() {
                 progressBarWaterTemperatureText.text = "${progressBarPercentage}%"
 
                 if (progressBarPercentage >= 90) {
-                    notificationHandler.showNotification("TEMPERATURA BEBEDERO", "La temperatura supera la máxima permitida")
+                    notificationHandler.showNotificationTemperature("TEMPERATURA BEBEDERO", "Revisar bebedero", "La temperatura del agua se encuentra en estado crítico. Considere cambiar el agua del bebedero.")
+                    notificationHandler.showSummaryNotification()
                 }
             } else {
                 Log.d("MainActivity", "No temperature data available")
@@ -231,11 +303,16 @@ class MainActivity : AppCompatActivity() {
         progressBarWaterQuality.progress = progressBarWaterQualityValue
         progressBarWaterQualityText.text = "${progressBarWaterQualityValue}%"
 
-        val waterQualityMessage = when {
-            waterQuality < medDaysWithoutFill  -> "Calidad del agua: buena"
-            waterQuality < maxDaysWithoutFill -> "Calidad del agua: media"
-            else -> "Cambiar agua del bebedero"
+        val waterQualityMessage: String = when {
+            waterQuality < medDaysWithoutFill  -> "Calidad del agua: excelente"
+            waterQuality < maxDaysWithoutFill -> "Calidad del agua: buena"
+            else -> {
+                notificationHandler.showNotificationQuality("CALIDAD DEL AGUA", "Revisar bebedero", "La calidad del agua no es buena. Considere cambiar el agua del bebedero.")
+                notificationHandler.showSummaryNotification()
+                "Cambiar agua del bebedero"
+            }
         }
+
         textViewWaterQuality.text = waterQualityMessage
     }
 

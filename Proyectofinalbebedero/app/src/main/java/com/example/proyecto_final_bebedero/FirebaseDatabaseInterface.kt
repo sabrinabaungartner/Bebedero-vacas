@@ -14,4 +14,10 @@ interface FirebaseDatabaseInterface {
     fun getWaterMaxDaysWithoutFill(listener: (Int) -> Unit) //listener lambda function
 
     fun getWaterMedDaysWithoutFill(listener: (Int) -> Unit) //listener lambda function
+
+    fun setMaxWaterTemperature(value: Double)
+
+    fun setWaterMaxDaysWithoutFill(value: Int)
+
+    fun setWaterMedDaysWithoutFill(value: Int)
 }

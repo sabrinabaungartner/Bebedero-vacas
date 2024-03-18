@@ -93,7 +93,7 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
     override fun getWaterQuality(listener: (Int) -> Unit) {
         val currentWaterQuality = mDatabase.child("data_actual").child("dias_sin_rellenar") //Ref dias_sin_rellenar
 
-        // Agregar el listener para la temperatura máxima
+        // Listener when water quality value changes
         currentWaterQuality.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val currentWaterQualityValue = dataSnapshot.getValue(Int::class.java) ?: 99 // Get current water quality value
@@ -136,5 +136,44 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
                 Log.d("FirebaseDatabaseHandler", "Error in getWaterMedDaysWithoutFill function")
             }
         })
+    }
+
+    override fun setMaxWaterTemperature(value: Double) {
+        val maxWaterTemperatureRef = mDatabase.child("parametros").child("temperatura_maxima") // Reference to max temperature
+
+        // Set the new max water temperature value in Firebase
+        maxWaterTemperatureRef.setValue(value)
+            .addOnSuccessListener {
+                Log.d("FirebaseDatabaseHandler", "Max water temperature updated successfully to $value")
+            }
+            .addOnFailureListener { e ->
+                Log.d("FirebaseDatabaseHandler", "Error updating max water temperature", e)
+            }
+    }
+
+    override fun setWaterMaxDaysWithoutFill(value: Int) {
+        val maxDaysWithoutFill = mDatabase.child("parametros").child("dias_max_sin_rellenar") // Reference to max temperature
+
+        // Set the new max days without fill value in Firebase
+        maxDaysWithoutFill.setValue(value)
+            .addOnSuccessListener {
+                Log.d("FirebaseDatabaseHandler", "Max days without fill updated successfully to $value")
+            }
+            .addOnFailureListener { e ->
+                Log.d("FirebaseDatabaseHandler", "Error updating max days without fill", e)
+            }
+    }
+
+    override fun setWaterMedDaysWithoutFill(value: Int) {
+        val medDaysWithoutFill = mDatabase.child("parametros").child("dias_med_sin_rellenar") // Reference to max temperature
+
+        // Set the new max days without fill value in Firebase
+        medDaysWithoutFill.setValue(value)
+            .addOnSuccessListener {
+                Log.d("FirebaseDatabaseHandler", "Med days without fill updated successfully to $value")
+            }
+            .addOnFailureListener { e ->
+                Log.d("FirebaseDatabaseHandler", "Error updating med days without fill", e)
+            }
     }
 }
