@@ -1,0 +1,29 @@
+<menu
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home"
+            android:title="Configuración de parámetros"
+            tools:ignore="HardcodedText" />
+
+        <item
+            android:id="@+id/nav_gallery"
+            android:title="Historial de la temperatura del agua"
+            tools:ignore="HardcodedText" />
+
+        <item
+            android:id="@+id/nav_gallery1"
+            android:title="Historial del nivel de agua"
+            tools:ignore="HardcodedText" />
+
+        <item
+            android:id="@+id/nav_settings"
+            android:title="Historial de calidad del agua"
+            tools:ignore="HardcodedText" />
+    </group>
+</menu>
+
+    <!-- android:icon="@drawable/ic_home"
+    android:icon="@drawable/ic_gallery"
+    android:icon="@drawable/ic_settings" -->
