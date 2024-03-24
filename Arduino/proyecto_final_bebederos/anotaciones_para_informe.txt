@@ -1,0 +1,4 @@
+libreria usada ESP32 Firebase by Rupak Poddar
+https://www.arduino.cc/reference/en/libraries/esp32-firebase/
+documentacion 
+https://github.com/Rupakpoddar/ESP32Firebase/tree/main
