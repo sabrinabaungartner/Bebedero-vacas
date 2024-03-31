@@ -19,8 +19,11 @@
 #define USE_NAME // Comment this to use MAC address instead of a slave_name
 #define LED_BT_BLUE 2 // LED onboard
 #define LED_WHITE 5 // LED that lights up when a word is received from the slave
-// Definimos la palabra que se espera recibir del esclavo para encender el LED
-#define WORD_TO_TRIGGER_LED "Hello"
+#define WORD_TO_TRIGGER_LED "Hello" // Word that the master expects to receive from the slave
+#define ESCAPE_CHARACTER '/'
+
+uint8_t data [] = {'H', 'e', 'l', 'l', 'o', ESCAPE_CHARACTER};
+size_t dataLength = sizeof(data);
 
 // Check if Bluetooth is available
 #if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
@@ -46,19 +49,6 @@ bool slave_is_connected = false;
 
 // Callback function for Bluetooth
 void callback(esp_spp_cb_event_t event, esp_spp_cb_param_t *param){
-  Serial.println("----- START CALLBACK FUNCTION -----");
-  if (event == ESP_SPP_INIT_EVT) {
-    Serial.println("SPP mode is initialized");
-  }
-
-  if (event == ESP_SPP_UNINIT_EVT) {
-    Serial.println("SPP mode is deinitialized");
-  }
-
-  if (event == ESP_SPP_DISCOVERY_COMP_EVT) {
-    Serial.println("Service discovery is complete");
-  }
-
   if (event == ESP_SPP_OPEN_EVT) {
     Serial.println("A SPP client opens a connection");
     digitalWrite(LED_BT_BLUE, HIGH);
@@ -70,24 +60,6 @@ void callback(esp_spp_cb_event_t event, esp_spp_cb_param_t *param){
     digitalWrite(LED_BT_BLUE, LOW);
     slave_is_connected = false;
   }
-
-  if (event == ESP_SPP_START_EVT) {
-    Serial.println("the SPP server is initialized");
-  }
-
-  if (event == ESP_SPP_CL_INIT_EVT) {
-    Serial.println("A SPP client initializes a connection");
-  }
-
-  if (event == ESP_SPP_SRV_OPEN_EVT) {
-    Serial.println("a client connects to the SPP server");
-  }
-
-  if (event == ESP_SPP_SRV_STOP_EVT) {
-    Serial.println("the SPP server stops");
-  }
-
-  Serial.println("----- END CALLBACK FUNCTION -----");
 }
 
 void setup() {
@@ -121,23 +93,15 @@ void loop() {
   }
 
   else {
-    /*if (Serial.available()) {
-      SerialBT.write(Serial.read());
-    }*/
     delay(3000);
-    SerialBT.print("Hello");
-    /*if (SerialBT.available()) {
-      Serial.write(SerialBT.read());
-    }*/
-    //delay(20);
+    SerialBT.write(data, dataLength);
 
-    if (SerialBT.available()) {
-      String receivedData = SerialBT.readString(); // Leer los datos recibidos del esclavo
-      Serial.println("Received: " + receivedData);
-      if (receivedData == WORD_TO_TRIGGER_LED) { // Comprobar si los datos recibidos coinciden con la palabra clave
-        digitalWrite(LED_WHITE, HIGH); // Encender el LED blanco
-        delay(1000); // Mantener encendido durante 1 segundo (ajustable)
-        digitalWrite(LED_WHITE, LOW); // Apagar el LED blanco
+    while (SerialBT.available()) {
+      char receivedByte = SerialBT.read();
+      if (receivedByte == '/') {
+        digitalWrite(LED_WHITE, HIGH);
+        delay(1000);
+        digitalWrite(LED_WHITE, LOW);
       }
     }
   }
