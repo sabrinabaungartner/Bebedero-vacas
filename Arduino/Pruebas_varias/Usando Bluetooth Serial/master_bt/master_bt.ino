@@ -62,8 +62,7 @@ void callback(esp_spp_cb_event_t event, esp_spp_cb_param_t *param){
   }
 }
 
-void setup() {
-  Serial.begin(115200);
+void set_bluetooth_configuration() {
   pinMode(LED_BT_BLUE, OUTPUT);
   pinMode(LED_WHITE, OUTPUT);
 
@@ -82,7 +81,7 @@ void setup() {
   }
 }
 
-void loop() {
+void check_bluetooth_state() {
   if (!slave_is_connected) {
     while (!connect_to_slave()) {
       digitalWrite(LED_BT_BLUE, HIGH);
@@ -105,6 +104,15 @@ void loop() {
       }
     }
   }
+}
+
+void setup() {
+  Serial.begin(115200);
+  set_bluetooth_configuration();
+}
+
+void loop() {
+  check_bluetooth_state();
 }
 
 bool connect_to_slave() {
