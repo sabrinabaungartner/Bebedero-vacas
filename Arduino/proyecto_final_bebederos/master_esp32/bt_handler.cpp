@@ -1,15 +1,15 @@
 #include "bt_handler.h"
 #include <Arduino.h>
 #include "BluetoothSerial.h"
+#include "package.h"
+
+uint8_t rx_tx_buf[SIZE_ARRAY];
+struct packet pac_to_send, my_received_packet_struct;
+uint8_t received_array[SIZE_ARRAY]; 
 
 #define USE_NAME // Comment this to use MAC address instead of a slave_name
 #define LED_BT_BLUE 2 // LED onboard
 #define LED_WHITE 5 // LED that lights up when a word is received from the slave
-#define WORD_TO_TRIGGER_LED "Hello" // Word that the master expects to receive from the slave
-#define ESCAPE_CHARACTER '/'
-
-uint8_t data [] = {'H', 'e', 'l', 'l', 'o', ESCAPE_CHARACTER};
-size_t dataLength = sizeof(data);
 
 // Check if Bluetooth is available
 #if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
@@ -33,8 +33,9 @@ String master_name = "ESP32-BT-Master";
 bool slave_is_connected = false;
 
 // Callback function for Bluetooth
-void callback(esp_spp_cb_event_t event, esp_spp_cb_param_t *param){
+void callback(esp_spp_cb_event_t event, esp_spp_cb_param_t *param){ //funciona cuando ya se están por pasar datos
   if (event == ESP_SPP_OPEN_EVT) {
+    Serial.println("estoy en ESP_SPP_OPEN_EVT");
     digitalWrite(LED_BT_BLUE, HIGH);
     slave_is_connected = true;
   }
@@ -43,6 +44,10 @@ void callback(esp_spp_cb_event_t event, esp_spp_cb_param_t *param){
     digitalWrite(LED_BT_BLUE, LOW);
     slave_is_connected = false;
   }
+}
+
+bool check_slave_is_connected() {
+  return slave_is_connected;
 }
 
 void set_bluetooth_configuration() {
@@ -78,7 +83,8 @@ void check_bluetooth_state() {
 
   else {
     delay(3000);
-    SerialBT.write(data, dataLength);
+    //SerialBT.write(data, dataLength);
+    //send_via_bt(data, dataLength);
 
     while (SerialBT.available()) {
       char receivedByte = SerialBT.read();
@@ -90,3 +96,53 @@ void check_bluetooth_state() {
     }
   }
 }
+
+void send_via_bt(uint8_t array[], uint8_t size_array) {
+  SerialBT.write(array, size_array);
+}
+
+bool check_received_package() {
+
+}
+
+
+
+
+
+// ********************************************************************************************************************** //
+void send_package() {
+  packet_to_send(&pac_to_send, rx_tx_buf);
+  send_via_bt(rx_tx_buf, sizeof(rx_tx_buf));
+}
+
+void create_package_to_send(uint8_t size, uint8_t message, uint8_t water_level) {
+  pac_to_send.length = size;
+  pac_to_send.type_of_message = message;
+  pac_to_send.payload[0] = water_level;
+}
+
+void request_water_level() {
+  if (!check_slave_is_connected()) {
+    while (!connect_to_slave()) {
+      delay(1000);
+    }
+  }
+  else {
+    create_package_to_send(SIZE_ARRAY, GET_WATER_LEVEL, NULO);
+    send_package();
+  }
+}
+
+uint8_t receive_requested_water_level() {
+  uint8_t index = 0;
+  while (SerialBT.available()) {
+    received_array[index++] = SerialBT.read();
+  }
+
+  received_packet(&my_received_packet_struct, received_array);
+
+  return my_received_packet_struct.payload[0];
+}
+
+
+
