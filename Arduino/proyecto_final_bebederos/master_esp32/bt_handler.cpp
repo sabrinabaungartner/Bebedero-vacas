@@ -33,7 +33,7 @@ String master_name = "ESP32-BT-Master";
 bool slave_is_connected = false;
 
 // Callback function for Bluetooth
-void callback(esp_spp_cb_event_t event, esp_spp_cb_param_t *param){ //funciona cuando ya se están por pasar datos
+void callback(esp_spp_cb_event_t event, esp_spp_cb_param_t *param){ // it works when passing data
   if (event == ESP_SPP_OPEN_EVT) {
     Serial.println("estoy en ESP_SPP_OPEN_EVT");
     digitalWrite(LED_BT_BLUE, HIGH);
@@ -44,10 +44,6 @@ void callback(esp_spp_cb_event_t event, esp_spp_cb_param_t *param){ //funciona c
     digitalWrite(LED_BT_BLUE, LOW);
     slave_is_connected = false;
   }
-}
-
-bool check_slave_is_connected() {
-  return slave_is_connected;
 }
 
 void set_bluetooth_configuration() {
@@ -72,44 +68,10 @@ bool connect_to_slave() {
   return slave_is_connected;
 }
 
-void check_bluetooth_state() {
-  if (!slave_is_connected) {
-    while (!connect_to_slave()) {
-      digitalWrite(LED_BT_BLUE, HIGH);
-      delay(1000);
-      digitalWrite(LED_BT_BLUE, LOW);
-    }
-  }
-
-  else {
-    delay(3000);
-    //SerialBT.write(data, dataLength);
-    //send_via_bt(data, dataLength);
-
-    while (SerialBT.available()) {
-      char receivedByte = SerialBT.read();
-      if (receivedByte == '/') {
-        digitalWrite(LED_WHITE, HIGH);
-        delay(1000);
-        digitalWrite(LED_WHITE, LOW);
-      }
-    }
-  }
-}
-
 void send_via_bt(uint8_t array[], uint8_t size_array) {
   SerialBT.write(array, size_array);
 }
 
-bool check_received_package() {
-
-}
-
-
-
-
-
-// ********************************************************************************************************************** //
 void send_package() {
   packet_to_send(&pac_to_send, rx_tx_buf);
   send_via_bt(rx_tx_buf, sizeof(rx_tx_buf));

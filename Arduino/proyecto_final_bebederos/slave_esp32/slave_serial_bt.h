@@ -22,6 +22,7 @@ extern BluetoothSerial SerialBT;
   #error Serial Port Profile for Bluetooth is not available or not enabled. It is only available for the ESP32 chip.
 #endif
 
-// Callback function for Bluetooth
-void callback(esp_spp_cb_event_t event, esp_spp_cb_param_t *param);
+void callback(esp_spp_cb_event_t event, esp_spp_cb_param_t *param); // Callback function for Bluetooth
+void set_bluetooth_configuration();
+void check_bluetooth_SPP_RxHandler();
 #endif

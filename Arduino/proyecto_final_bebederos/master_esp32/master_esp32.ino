@@ -11,7 +11,6 @@ void setup() {
 void loop() {
   //check_wifi();
   //get_value_example();
-  //delay(1000);
   request_water_level();
   uint8_t water_value = receive_requested_water_level();
   Serial.print("water level value: ");
