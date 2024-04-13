@@ -9,7 +9,6 @@ uint8_t received_array[SIZE_ARRAY];
 
 #define USE_NAME // Comment this to use MAC address instead of a slave_name
 #define LED_BT_BLUE 2 // LED onboard
-#define LED_WHITE 5 // LED that lights up when a word is received from the slave
 
 // Check if Bluetooth is available
 #if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
@@ -48,7 +47,6 @@ void callback(esp_spp_cb_event_t event, esp_spp_cb_param_t *param){ // it works 
 
 void set_bluetooth_configuration() {
   pinMode(LED_BT_BLUE, OUTPUT);
-  pinMode(LED_WHITE, OUTPUT);
 
   SerialBT.register_callback(callback);
 
