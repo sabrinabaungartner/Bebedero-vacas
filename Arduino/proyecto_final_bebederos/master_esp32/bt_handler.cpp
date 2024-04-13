@@ -84,7 +84,7 @@ void create_package_to_send(uint8_t size, uint8_t message, uint8_t water_level) 
 }
 
 void request_water_level() {
-  if (!check_slave_is_connected()) {
+  if (!slave_is_connected) {
     while (!connect_to_slave()) {
       delay(1000);
     }
