@@ -1,6 +1,7 @@
 #include "slave_serial_bt.h"
 #include "Arduino.h"
 #include "package.h"
+#include "water_level_sensor.h"
 
 String device_name = "ESP32-BT-Slave";
 
@@ -39,7 +40,7 @@ void assemble_package(uint8_t size, uint8_t reply, uint8_t water_level) {
 void check_order() {
   switch(my_received_packet_struct.type_of_message) {
     case GET_WATER_LEVEL:
-      assemble_package(SIZE_ARRAY, REPLY_WATER_LEVEL, 100);
+      assemble_package(SIZE_ARRAY, REPLY_WATER_LEVEL, read_water_level());
       break;
   }
 }
