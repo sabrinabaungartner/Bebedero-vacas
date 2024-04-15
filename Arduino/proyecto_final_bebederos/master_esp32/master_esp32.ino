@@ -7,19 +7,25 @@
 // Variables
 int seconds = 0;
 
-// Function declarations
+// Declaration of functions
 void iniciar_timer();
 void funcion_timer();
+void update_status_cattle_waterer();
+
+void update_status_cattle_waterer(int water_value) {
+  set_current_water_level_value(water_value);
+  set_current_date();
+}
 
 void funcion_timer() {
   if (seconds == 5) {
     Serial.println("Entrando en if de funcion_timer");
     check_wifi();
-    get_value_example();
     request_water_level();
     uint8_t water_value = receive_requested_water_level();
     Serial.print("water level value: ");
     Serial.println(water_value);
+    update_status_cattle_waterer((int) water_value);
     seconds = 0;
     Serial.println("Saliendo de if de funcion_timer");
   }
@@ -35,6 +41,7 @@ void iniciar_timer(){
 void setup() {
   Serial.begin(115200);
   setup_wifi();
+  set_NTP_server();
   set_bluetooth_configuration();
   fnqueue_init();
   iniciar_timer();

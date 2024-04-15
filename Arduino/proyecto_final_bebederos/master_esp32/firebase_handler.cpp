@@ -4,6 +4,7 @@
 #include "credentials_firebase.h"
 #include <addons/TokenHelper.h> // Provide the token generation process info.
 #include <addons/RTDBHelper.h> // Provide the RTDB payload printing info and other helper functions.
+#include "time.h"
 
 FirebaseData fbdo; // Firebase Data object
 FirebaseAuth auth;
@@ -12,6 +13,10 @@ FirebaseConfig config;
 unsigned long last_connection_attempt = 0;
 const unsigned long connection_interval = 10000; // 1000ms attempt to reconnect
 bool is_connected = false;
+
+const char* ntpServer = "pool.ntp.org";
+const long  gmtOffset_sec = -3 * 3600;
+const int   daylightOffset_sec = 0;
 
 void check_wifi() {
   if (WiFi.status() != WL_CONNECTED && is_connected) { is_connected = false;
@@ -47,8 +52,33 @@ void setup_wifi() {
   Firebase.begin(&config, &auth);
 }
 
-void get_value_example() {
+void set_NTP_server() {
+  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+}
+
+void set_current_water_level_value(int value) {
   if (Firebase.ready()) {
-    Serial.printf("Get water_level backup_1... %s\n", Firebase.getInt(fbdo, F("UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/backup_data/backup_1/water_level")) ? String(fbdo.to<int>()).c_str() : fbdo.errorReason().c_str());
- }
+    Firebase.setInt(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data/water_level", value);
+  }
+}
+
+void set_current_date() {
+  struct tm timeinfo;
+  if(!getLocalTime(&timeinfo)){
+    Serial.println("Failed to obtain time");
+    return;
+  }
+
+  char datetime_str[100]; // String to store date and time
+
+  sprintf(datetime_str, "%02d/%02d/%04d %02d:%02d:%02d",
+          timeinfo.tm_mday, timeinfo.tm_mon + 1, timeinfo.tm_year + 1900,
+          timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
+
+  Serial.println("Fecha y hora:");
+  Serial.println(datetime_str);
+
+  if (Firebase.ready()) {
+    Firebase.setString(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data/date", datetime_str);
+  }
 }
