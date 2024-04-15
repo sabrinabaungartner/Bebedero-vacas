@@ -82,3 +82,27 @@ void set_current_date() {
     Firebase.setString(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data/date", datetime_str);
   }
 }
+
+void backup_current_date() {
+  if (Firebase.ready()) {
+    int current_water_level = Firebase.getInt(fbdo, F("UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data/water_level"));
+    
+    /*if (Firebase.getString(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data/date")) {
+      if (fbdo.dataType() == FirebaseDataType::STRING) {
+        String current_date = fbdo.stringData();
+      }
+    }
+
+    if (Firebase.getString(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data/water_temperature")) {
+      if (fbdo.dataType() == FirebaseDataType::FLOAT) {
+        float current_water_temperature = fbdo.stringData();
+      }
+    }
+
+    if (Firebase.getString(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/backup_data/ultimo_backup_modificado")) {
+      if (fbdo.dataType() == FirebaseDataType::STRING) {
+        float current_cattle_waterer = fbdo.stringData();
+      }
+    }*/
+  }
+}

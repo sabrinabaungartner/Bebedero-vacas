@@ -13,6 +13,7 @@ void funcion_timer();
 void update_status_cattle_waterer();
 
 void update_status_cattle_waterer(int water_value) {
+  backup_current_date();
   set_current_water_level_value(water_value);
   set_current_date();
 }
