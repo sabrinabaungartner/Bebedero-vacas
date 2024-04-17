@@ -5,6 +5,7 @@
 #include <addons/TokenHelper.h> // Provide the token generation process info.
 #include <addons/RTDBHelper.h> // Provide the RTDB payload printing info and other helper functions.
 #include "time.h"
+#include <ArduinoJson.h>
 
 FirebaseData fbdo; // Firebase Data object
 FirebaseAuth auth;
@@ -83,26 +84,82 @@ void set_current_date() {
   }
 }
 
+/*void backup_current_date() {
+  if (Firebase.ready()) {
+    int last_backup = Firebase.getInt(fbdo, F("UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/backup_data/last_backup_modified"));
+    Serial.print("last_backup: ");
+    Serial.println(last_backup);
+    Serial.println(" ");
+    last_backup+=1;
+    String backup_node = "backup_" + String(last_backup);
+    
+    if (Firebase.getJSON(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data")) {
+      if (fbdo.dataType() == "json") {
+        FirebaseJson json; // Create FirebaseJson object
+ 
+        if (json.setJsonData(fbdo.payload())) { // Parse JSON data
+          if (Firebase.setJSON(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/backup_data/" + backup_node, json)) {
+            Serial.println("Datos respaldados correctamente.");
+          }
+        }
+      }
+    }
+
+    if (Firebase.setInt(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/backup_data/last_backup_modified", last_backup)) {
+            Serial.println("Todo ok.");
+    }
+  }
+}*/
+
+int get_last_backup_modified() {
+  return Firebase.getInt(fbdo, F("UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/backup_data/last_backup_modified"));
+}
+
+void set_last_backup_modified(int value) {
+  // Actualiza el valor de last_backup_modified en la base de datos
+    if (Firebase.setInt(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/backup_data/last_backup_modified", value)) {
+      Serial.println("Valor de last_backup_modified actualizado correctamente.");
+    } else {
+      Serial.println("Error al actualizar el valor de last_backup_modified.");
+    }
+  }
+
 void backup_current_date() {
   if (Firebase.ready()) {
-    int current_water_level = Firebase.getInt(fbdo, F("UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data/water_level"));
+    int last_backup = get_last_backup_modified();
+    Serial.print("last_backup antes de incrementar: ");
+    Serial.println(last_backup);
+
+    // Incrementa el valor de last_backup en 1
+    last_backup++;
+
+    Serial.print("last_backup después de incrementar: ");
+    Serial.println(last_backup);
+
+    String backup_node = "backup_" + String(last_backup);
+
+    set_last_backup_modified(last_backup);
     
-    /*if (Firebase.getString(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data/date")) {
-      if (fbdo.dataType() == FirebaseDataType::STRING) {
-        String current_date = fbdo.stringData();
+    // Realiza el respaldo de los datos actuales
+    if (Firebase.getJSON(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data")) {
+      if (fbdo.dataType() == "json") {
+        FirebaseJson json;
+        if (json.setJsonData(fbdo.payload())) {
+          // Respaldar los datos actuales
+          if (Firebase.setJSON(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/backup_data/" + backup_node, json)) {
+            Serial.println("Datos respaldados correctamente.");
+          } else {
+            Serial.println("Error al respaldar datos.");
+          }
+        } else {
+          Serial.println("Error al parsear datos JSON.");
+        }
+      } else {
+        Serial.println("El tipo de datos no es JSON.");
       }
+    } else {
+      Serial.println("Error al obtener datos actuales.");
     }
-
-    if (Firebase.getString(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data/water_temperature")) {
-      if (fbdo.dataType() == FirebaseDataType::FLOAT) {
-        float current_water_temperature = fbdo.stringData();
-      }
-    }
-
-    if (Firebase.getString(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/backup_data/ultimo_backup_modificado")) {
-      if (fbdo.dataType() == FirebaseDataType::STRING) {
-        float current_cattle_waterer = fbdo.stringData();
-      }
-    }*/
   }
 }
+
