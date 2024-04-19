@@ -101,16 +101,22 @@ void backup_current_date() {
   if (Firebase.ready()) {
     int last_backup = get_last_backup_modified();
 
-    last_backup = (last_backup + 1) % 10;
+    last_backup = (last_backup + 1) % MAX_BACKUPS;
 
-    String backup_node = "backup_" + String(last_backup);
+    String path = "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/backup_data/backup_" + String(last_backup);
+    
+    // Check if the path exists, create it if it doesn't
+    if (!Firebase.get(fbdo, path)) {
+      // Path does not exist, create it
+      Firebase.set(fbdo, path, nullptr);
+    }
     
     // Save current data intp backup
     if (Firebase.getJSON(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data")) {
       if (fbdo.dataType() == "json") {
         FirebaseJson json;
         if (json.setJsonData(fbdo.payload())) {
-          Firebase.setJSON(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/backup_data/" + backup_node, json);
+          Firebase.setJSON(fbdo, path, json);
         }
       }
     }

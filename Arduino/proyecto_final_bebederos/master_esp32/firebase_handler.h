@@ -1,6 +1,7 @@
 #ifndef FIREBASE_HANDLER_H
 #define FIREBASE_HANDLER_H
 #define ERROR_GET_RTDB 99999
+#define MAX_BACKUPS 15
 
 void check_wifi();
 void setup_wifi();
