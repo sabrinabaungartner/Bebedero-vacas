@@ -20,7 +20,6 @@ void update_status_cattle_waterer(int water_value) {
 
 void funcion_timer() {
   if (seconds == 5) {
-    Serial.println("Entrando en if de funcion_timer");
     check_wifi();
     request_water_level();
     uint8_t water_value = receive_requested_water_level();
@@ -28,7 +27,6 @@ void funcion_timer() {
     Serial.println(water_value);
     update_status_cattle_waterer((int) water_value);
     seconds = 0;
-    Serial.println("Saliendo de if de funcion_timer");
   }
 
   seconds += 1;
@@ -50,5 +48,4 @@ void setup() {
 
 void loop() {
   fnqueue_run();
-  //Serial.println("En loop");
 }
