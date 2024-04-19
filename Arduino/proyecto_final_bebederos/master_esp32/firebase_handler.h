@@ -1,5 +1,6 @@
 #ifndef FIREBASE_HANDLER_H
 #define FIREBASE_HANDLER_H
+#define ERROR_GET_RTDB 99999
 
 void check_wifi();
 void setup_wifi();

@@ -84,82 +84,37 @@ void set_current_date() {
   }
 }
 
-/*void backup_current_date() {
-  if (Firebase.ready()) {
-    int last_backup = Firebase.getInt(fbdo, F("UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/backup_data/last_backup_modified"));
-    Serial.print("last_backup: ");
-    Serial.println(last_backup);
-    Serial.println(" ");
-    last_backup+=1;
-    String backup_node = "backup_" + String(last_backup);
-    
-    if (Firebase.getJSON(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data")) {
-      if (fbdo.dataType() == "json") {
-        FirebaseJson json; // Create FirebaseJson object
- 
-        if (json.setJsonData(fbdo.payload())) { // Parse JSON data
-          if (Firebase.setJSON(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/backup_data/" + backup_node, json)) {
-            Serial.println("Datos respaldados correctamente.");
-          }
-        }
-      }
-    }
-
-    if (Firebase.setInt(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/backup_data/last_backup_modified", last_backup)) {
-            Serial.println("Todo ok.");
-    }
-  }
-}*/
-
 int get_last_backup_modified() {
-  return Firebase.getInt(fbdo, F("UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/backup_data/last_backup_modified"));
+  Firebase.getInt(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/backup_data/last_backup_modified");
+  int last_modified_backup_value = ERROR_GET_RTDB;
+  if (fbdo.dataTypeEnum() == firebase_rtdb_data_type_integer) {
+      last_modified_backup_value = fbdo.to<int>();
+  }
+  return last_modified_backup_value;
 }
 
 void set_last_backup_modified(int value) {
-  // Actualiza el valor de last_backup_modified en la base de datos
-    if (Firebase.setInt(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/backup_data/last_backup_modified", value)) {
-      Serial.println("Valor de last_backup_modified actualizado correctamente.");
-    } else {
-      Serial.println("Error al actualizar el valor de last_backup_modified.");
-    }
-  }
+  Firebase.setInt(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/backup_data/last_backup_modified", value);
+}
 
 void backup_current_date() {
   if (Firebase.ready()) {
     int last_backup = get_last_backup_modified();
-    Serial.print("last_backup antes de incrementar: ");
-    Serial.println(last_backup);
 
-    // Incrementa el valor de last_backup en 1
-    last_backup++;
-
-    Serial.print("last_backup después de incrementar: ");
-    Serial.println(last_backup);
+    last_backup = (last_backup + 1) % 10;
 
     String backup_node = "backup_" + String(last_backup);
-
-    set_last_backup_modified(last_backup);
     
-    // Realiza el respaldo de los datos actuales
+    // Save current data intp backup
     if (Firebase.getJSON(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data")) {
       if (fbdo.dataType() == "json") {
         FirebaseJson json;
         if (json.setJsonData(fbdo.payload())) {
-          // Respaldar los datos actuales
-          if (Firebase.setJSON(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/backup_data/" + backup_node, json)) {
-            Serial.println("Datos respaldados correctamente.");
-          } else {
-            Serial.println("Error al respaldar datos.");
-          }
-        } else {
-          Serial.println("Error al parsear datos JSON.");
+          Firebase.setJSON(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/backup_data/" + backup_node, json);
         }
-      } else {
-        Serial.println("El tipo de datos no es JSON.");
       }
-    } else {
-      Serial.println("Error al obtener datos actuales.");
     }
+
+    set_last_backup_modified(last_backup);
   }
 }
-
