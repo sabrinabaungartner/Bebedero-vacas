@@ -1,0 +1,4 @@
+Al usar Firebase:
+* Cuando las carpetas de backup no están creadas, el tiempo almacenado en la db no es cada 5 seg, porque le toma tiempo crear la carpeta.
+* Una vez que ya se crearon las carpetas, el tiempo pasa mas rapido para las primeras, y despues al reacomodarse ahí sí el date cambia cada 5 segundos.
+* Revisar esta parte del proyecto y buscar una solución al desfazaje en la sincronización.
