@@ -19,6 +19,8 @@ const char* ntpServer = "pool.ntp.org";
 const long  gmtOffset_sec = -3 * 3600;
 const int   daylightOffset_sec = 0;
 
+String cattle_waterer_selected = "cattle_waterer_1";
+
 void check_wifi() {
   if (WiFi.status() != WL_CONNECTED && is_connected) { is_connected = false;
   } else if (WiFi.status() == WL_CONNECTED && !is_connected) { is_connected = true; }
@@ -123,4 +125,9 @@ void backup_current_date() {
 
     set_last_backup_modified(last_backup);
   }
+}
+
+void get_cattle_waterer_selected() {
+  Firebase.getString(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_selected");
+  cattle_waterer_selected = fbdo.to<String>();
 }
