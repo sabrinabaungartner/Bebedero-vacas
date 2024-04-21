@@ -2,3 +2,17 @@ libreria usada ESP32 Firebase by Rupak Poddar
 https://www.arduino.cc/reference/en/libraries/esp32-firebase/
 documentacion 
 https://github.com/Rupakpoddar/ESP32Firebase/tree/main
+
+
+// ************************************************** //
+ENTRADAS RESERVADAS DEL ESP32 PARA WIFI
+Solo se puede usar los puertos del ADC2 cuando el no se usa el wifi. Pines:
+* D25
+* D26
+* D27
+* D14
+* D12
+* D13
+* D15
+* D2
+* D4
