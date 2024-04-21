@@ -65,6 +65,12 @@ void set_current_water_level_value(int value) {
   }
 }
 
+void set_current_water_temperature_value(float value) {
+  if (Firebase.ready()) {
+    Firebase.setFloat(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data/water_temperature", value);
+  }
+}
+
 void set_current_date() {
   struct tm timeinfo;
   if(!getLocalTime(&timeinfo)){
@@ -88,7 +94,7 @@ void set_current_date() {
 
 int get_last_backup_modified() {
   Firebase.getInt(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/backup_data/last_backup_modified");
-  int last_modified_backup_value = ERROR_GET_RTDB;
+  int last_modified_backup_value = ERROR_GET_INT_RTDB;
   if (fbdo.dataTypeEnum() == firebase_rtdb_data_type_integer) {
       last_modified_backup_value = fbdo.to<int>();
   }

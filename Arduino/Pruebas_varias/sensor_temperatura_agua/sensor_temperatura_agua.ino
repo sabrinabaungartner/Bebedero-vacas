@@ -18,7 +18,7 @@ float tempC; // temperature in Celsius
 float tempF; // temperature in Fahrenheit
 
 void setup() {
-  Serial.begin(9600); // initialize serial
+  Serial.begin(115200); // initialize serial
   DS18B20.begin();    // initialize the DS18B20 sensor
 }
 

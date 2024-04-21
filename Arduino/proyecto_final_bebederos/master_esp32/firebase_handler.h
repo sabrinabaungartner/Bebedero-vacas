@@ -6,6 +6,7 @@
 void check_wifi();
 void setup_wifi();
 void set_current_water_level_value(int value);
+void set_current_water_temperature_value(float value);
 void set_current_date();
 void set_NTP_server();
 void backup_current_date();

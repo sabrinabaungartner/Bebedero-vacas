@@ -75,13 +75,15 @@ void send_package() {
   send_via_bt(rx_tx_buf, sizeof(rx_tx_buf));
 }
 
-void create_package_to_send(uint8_t size, uint8_t message, uint8_t water_level) {
+void create_package_to_send(uint8_t size, uint8_t message, uint8_t value) {
   pac_to_send.length = size;
   pac_to_send.type_of_message = message;
-  pac_to_send.payload[0] = water_level;
+  pac_to_send.payload[0] = value;
+  pac_to_send.payload[1] = value;
+  pac_to_send.payload[2] = value;
 }
 
-void request_water_level() {
+/*void request_water_level() {
   if (!slave_is_connected) {
     while (!connect_to_slave()) {
       delay(1000);
@@ -91,9 +93,21 @@ void request_water_level() {
     create_package_to_send(SIZE_ARRAY, GET_WATER_LEVEL, NULO);
     send_package();
   }
+}*/
+
+void request_water_level_temperature() {
+  if (!slave_is_connected) {
+    while (!connect_to_slave()) {
+      delay(1000);
+    }
+  }
+  else {
+    create_package_to_send(SIZE_ARRAY, GET_ALL, NULO);
+    send_package();
+  }
 }
 
-uint8_t receive_requested_water_level() {
+/*uint8_t receive_requested_water_level() {
   uint8_t index = 0;
   while (SerialBT.available()) {
     received_array[index++] = SerialBT.read();
@@ -102,6 +116,30 @@ uint8_t receive_requested_water_level() {
   received_packet(&my_received_packet_struct, received_array);
 
   return my_received_packet_struct.payload[0];
+}*/
+
+uint8_t receive_requested_water_level() {
+  return my_received_packet_struct.payload[0];
+}
+
+float receive_requested_water_temperature() {
+  uint8_t entera_uint8 = my_received_packet_struct.payload[1];
+  uint8_t decimal_uint8 = my_received_packet_struct.payload[2];
+
+  float entera_uint8_float = static_cast<float>(entera_uint8);
+  float decimal_uint8_float = static_cast<float>(decimal_uint8) / 100;
+
+  float float_number = entera_uint8_float + decimal_uint8_float;
+  return float_number;
+}
+
+void receive_package() {
+  uint8_t index = 0;
+  while (SerialBT.available()) {
+    received_array[index++] = SerialBT.read();
+  }
+
+  received_packet(&my_received_packet_struct, received_array);
 }
 
 
