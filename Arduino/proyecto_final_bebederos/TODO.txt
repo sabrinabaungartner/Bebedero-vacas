@@ -1,0 +1,5 @@
+generalizar bebederos:
+* preguntar bebedero seleccionado actual 
+* agregar opcion bebedero seleccionado en el paquete
+* ver opcion bebedero seleccionado en slave y tomar datos desde los sensores correspondientes
+* recibir datos y actualizar bebedero actual
