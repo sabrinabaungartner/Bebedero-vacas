@@ -133,7 +133,7 @@ float receive_requested_water_temperature() {
   return float_number;
 }
 
-void receive_package() {
+void receive_water_level_temperature() {
   uint8_t index = 0;
   while (SerialBT.available()) {
     received_array[index++] = SerialBT.read();

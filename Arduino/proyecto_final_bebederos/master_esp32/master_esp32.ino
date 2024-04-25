@@ -13,7 +13,6 @@ void funcion_timer();
 void update_status_cattle_waterer(int water_value, float water_temperature);
 
 void update_status_cattle_waterer(int water_value, float water_temperature) {
-  backup_current_date();
   set_current_water_level_value(water_value);
   set_current_water_temperature_value(water_temperature);
   set_current_date();
@@ -22,10 +21,19 @@ void update_status_cattle_waterer(int water_value, float water_temperature) {
 void funcion_timer() {
   if (seconds == 5) {
     check_wifi();
+  }
+
+  if (seconds == 10) {
+    backup_current_date();
+  }
+
+  if (seconds == 15) {
+    check_wifi();
+    //get_user_selected();
+    //get_cattle_waterer_selected();
     //request_water_level();
     request_water_level_temperature();
-    receive_package();
-    //array[3] water_lectures = receive_requested_water_level_temperature();
+    receive_water_level_temperature();
     uint8_t water_value = receive_requested_water_level();
     float water_temperature = receive_requested_water_temperature();
     Serial.print("water level value: ");

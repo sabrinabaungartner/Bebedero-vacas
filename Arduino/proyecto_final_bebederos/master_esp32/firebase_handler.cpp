@@ -1,11 +1,13 @@
 #include "firebase_handler.h"
 #include <WiFi.h>
-#include <FirebaseESP32.h>
+//#include <FirebaseESP32.h>
+#include <Firebase_ESP_Client.h>
 #include "credentials_firebase.h"
-#include <addons/TokenHelper.h> // Provide the token generation process info.
-#include <addons/RTDBHelper.h> // Provide the RTDB payload printing info and other helper functions.
+#include "addons/TokenHelper.h" // Provide the token generation process info.
+#include "addons/RTDBHelper.h" // Provide the RTDB payload printing info and other helper functions.
 #include "time.h"
 #include <ArduinoJson.h>
+#include <Arduino.h>
 
 FirebaseData fbdo; // Firebase Data object
 FirebaseAuth auth;
@@ -18,6 +20,9 @@ bool is_connected = false;
 const char* ntpServer = "pool.ntp.org";
 const long  gmtOffset_sec = -3 * 3600;
 const int   daylightOffset_sec = 0;
+
+int next_backup_to_modify_value = 0;
+int next_backup = 0;
 
 String cattle_waterer_selected = "cattle_waterer_1";
 
@@ -61,13 +66,15 @@ void set_NTP_server() {
 
 void set_current_water_level_value(int value) {
   if (Firebase.ready()) {
-    Firebase.setInt(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data/water_level", value);
+    //Firebase.setInt(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data/water_level", value);
+    Firebase.RTDB.setInt(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data/water_level", value);
   }
 }
 
 void set_current_water_temperature_value(float value) {
   if (Firebase.ready()) {
-    Firebase.setFloat(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data/water_temperature", value);
+    //Firebase.setFloat(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data/water_temperature", value);
+    Firebase.RTDB.setFloat(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data/water_temperature", value);
   }
 }
 
@@ -88,52 +95,63 @@ void set_current_date() {
   Serial.println(datetime_str);
 
   if (Firebase.ready()) {
-    Firebase.setString(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data/date", datetime_str);
+    Firebase.RTDB.setString(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data/date", datetime_str);
   }
 }
 
-int get_last_backup_modified() {
-  Firebase.getInt(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/backup_data/last_backup_modified");
-  int last_modified_backup_value = ERROR_GET_INT_RTDB;
-  if (fbdo.dataTypeEnum() == firebase_rtdb_data_type_integer) {
-      last_modified_backup_value = fbdo.to<int>();
+int get_next_backup_struct() {
+  if (Firebase.ready()) {
+    if (Firebase.RTDB.getInt(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/backup_data/next_backup_to_modify"))
+      if(fbdo.dataType()=="int"){
+        next_backup_to_modify_value = fbdo.intData();
+      }
+    else
+      Serial.println("error get");
   }
-  return last_modified_backup_value;
+  
+  return next_backup_to_modify_value;
 }
 
-void set_last_backup_modified(int value) {
-  Firebase.setInt(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/backup_data/last_backup_modified", value);
+void set_next_backup_to_modify(int value) {
+  Firebase.RTDB.setInt(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/backup_data/next_backup_to_modify", value);
 }
 
 void backup_current_date() {
   if (Firebase.ready()) {
-    int last_backup = get_last_backup_modified();
+    next_backup = get_next_backup_struct();
 
-    last_backup = (last_backup + 1) % MAX_BACKUPS;
+    String path = "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/backup_data/backup_" + String(next_backup);
+    Serial.print("path: ");
+    Serial.println(path);
 
-    String path = "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/backup_data/backup_" + String(last_backup);
+    // Crear un objeto JSON para almacenar los datos recibidos
+    FirebaseJson json;
     
     // Check if the path exists, create it if it doesn't
-    if (!Firebase.get(fbdo, path)) {
+    /*if (!Firebase.get(fbdo, path)) {
       // Path does not exist, create it
       Firebase.set(fbdo, path, nullptr);
-    }
+    }*/
     
     // Save current data intp backup
-    if (Firebase.getJSON(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data")) {
+    if (Firebase.RTDB.getJSON(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data")) {
       if (fbdo.dataType() == "json") {
-        FirebaseJson json;
         if (json.setJsonData(fbdo.payload())) {
-          Firebase.setJSON(fbdo, path, json);
+          if (Firebase.RTDB.setJSON(&fbdo, path, &json)) {
+            Serial.println("Datos JSON respaldados correctamente.");
+          } else {
+            Serial.println("Error al respaldar los datos JSON.");
+          }
         }
       }
     }
 
-    set_last_backup_modified(last_backup);
+    next_backup = (next_backup + 1) % MAX_BACKUPS;
+    set_next_backup_to_modify(next_backup);
   }
 }
 
-void get_cattle_waterer_selected() {
+/*void get_cattle_waterer_selected() {
   Firebase.getString(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_selected");
   cattle_waterer_selected = fbdo.to<String>();
-}
+}*/
