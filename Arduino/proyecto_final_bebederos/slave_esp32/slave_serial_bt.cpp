@@ -68,10 +68,12 @@ void bluetooth_SPP_TxHandler() {
 
 void check_bluetooth_SPP_RxHandler() {
   uint8_t index = 0;
-  while (SerialBT.available()) {
-    received_array[index++] = SerialBT.read();
-  }
+  if (SerialBT.available() > 0) {
+    while (SerialBT.available()) {
+      received_array[index++] = SerialBT.read();
+    }
 
-  received_packet(&my_received_packet_struct, received_array);
-  bluetooth_SPP_TxHandler();
+    received_packet(&my_received_packet_struct, received_array);
+    bluetooth_SPP_TxHandler();
+  }
 }
