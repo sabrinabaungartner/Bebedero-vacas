@@ -8,6 +8,7 @@
 int seconds = 0;
 uint8_t water_value = 0;
 float water_temperature = 0.0;
+int cattle_waterer_selected = 0;
 
 // Declaration of functions
 void iniciar_timer();
@@ -15,23 +16,23 @@ void funcion_timer();
 void update_status_cattle_waterer();
 
 void update_status_cattle_waterer() {
-  set_current_water_level_value((int) water_value);
-  set_current_water_temperature_value(water_temperature);
-  set_current_date();
+  set_current_water_level_value((int) water_value, cattle_waterer_selected);
+  set_current_water_temperature_value(water_temperature, cattle_waterer_selected);
+  set_current_date(cattle_waterer_selected);
 }
 
 void funcion_timer() {
   if (seconds == 5) {
     check_wifi();
+    cattle_waterer_selected = get_cattle_waterer_selected();
   }
 
   if (seconds == 10) {
-    backup_current_date();
+    backup_current_date(cattle_waterer_selected);
   }
 
   if (seconds == 15) {
     //get_user_selected();
-    //get_cattle_waterer_selected();
     request_water_level_temperature();
     receive_water_level_temperature();
     water_value = receive_requested_water_level();

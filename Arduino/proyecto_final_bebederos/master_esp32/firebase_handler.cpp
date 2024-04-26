@@ -21,10 +21,7 @@ const char* ntpServer = "pool.ntp.org";
 const long  gmtOffset_sec = -3 * 3600;
 const int   daylightOffset_sec = 0;
 
-int next_backup_to_modify_value = 0;
 int next_backup = 0;
-
-String cattle_waterer_selected = "cattle_waterer_1";
 
 void check_wifi() {
   if (WiFi.status() != WL_CONNECTED && is_connected) { is_connected = false;
@@ -64,21 +61,21 @@ void set_NTP_server() {
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
 }
 
-void set_current_water_level_value(int value) {
+void set_current_water_level_value(int value, int cattle_waterer_selected) {
   if (Firebase.ready()) {
     //Firebase.setInt(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data/water_level", value);
-    Firebase.RTDB.setInt(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data/water_level", value);
+    Firebase.RTDB.setInt(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/current_data/water_level", value);
   }
 }
 
-void set_current_water_temperature_value(float value) {
+void set_current_water_temperature_value(float value, int cattle_waterer_selected) {
   if (Firebase.ready()) {
     //Firebase.setFloat(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data/water_temperature", value);
-    Firebase.RTDB.setFloat(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data/water_temperature", value);
+    Firebase.RTDB.setFloat(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/current_data/water_temperature", value);
   }
 }
 
-void set_current_date() {
+void set_current_date(int cattle_waterer_selected) {
   struct tm timeinfo;
   if(!getLocalTime(&timeinfo)){
     Serial.println("Failed to obtain time");
@@ -95,32 +92,32 @@ void set_current_date() {
   Serial.println(datetime_str);
 
   if (Firebase.ready()) {
-    Firebase.RTDB.setString(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data/date", datetime_str);
+    Firebase.RTDB.setString(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/current_data/date", datetime_str);
   }
 }
 
-int get_next_backup_struct() {
+int get_next_backup_struct(int cattle_waterer_selected) {
   if (Firebase.ready()) {
-    if (Firebase.RTDB.getInt(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/backup_data/next_backup_to_modify"))
+    if (Firebase.RTDB.getInt(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/backup_data/next_backup_to_modify"))
       if(fbdo.dataType()=="int"){
-        next_backup_to_modify_value = fbdo.intData();
+        return fbdo.intData();
       }
     else
       Serial.println("error get");
   }
   
-  return next_backup_to_modify_value;
+  return 0;
 }
 
-void set_next_backup_to_modify(int value) {
-  Firebase.RTDB.setInt(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/backup_data/next_backup_to_modify", value);
+void set_next_backup_to_modify(int value, int cattle_waterer_selected) {
+  Firebase.RTDB.setInt(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/backup_data/next_backup_to_modify", value);
 }
 
-void backup_current_date() {
+void backup_current_date(int cattle_waterer_selected) {
   if (Firebase.ready()) {
-    next_backup = get_next_backup_struct();
+    next_backup = get_next_backup_struct(cattle_waterer_selected);
 
-    String path = "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/backup_data/backup_" + String(next_backup);
+    String path = "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/backup_data/backup_" + String(next_backup);
     Serial.print("path: ");
     Serial.println(path);
 
@@ -134,7 +131,7 @@ void backup_current_date() {
     }*/
     
     // Save current data intp backup
-    if (Firebase.RTDB.getJSON(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data")) {
+    if (Firebase.RTDB.getJSON(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/current_data")) {
       if (fbdo.dataType() == "json") {
         if (json.setJsonData(fbdo.payload())) {
           if (Firebase.RTDB.setJSON(&fbdo, path, &json)) {
@@ -147,11 +144,19 @@ void backup_current_date() {
     }
 
     next_backup = (next_backup + 1) % MAX_BACKUPS;
-    set_next_backup_to_modify(next_backup);
+    set_next_backup_to_modify(next_backup, cattle_waterer_selected);
   }
 }
 
-/*void get_cattle_waterer_selected() {
-  Firebase.getString(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_selected");
-  cattle_waterer_selected = fbdo.to<String>();
-}*/
+int get_cattle_waterer_selected() {
+  if (Firebase.RTDB.getInt(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_selected")) {
+    if(fbdo.dataType()=="int"){
+      return fbdo.intData();
+      //cattle_waterer_selected = fbdo.to<String>();
+    } else {
+      Serial.println("error get_cattle_waterer_selected");
+    }
+  }
+
+  return 0;
+}
