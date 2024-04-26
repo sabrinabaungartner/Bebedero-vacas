@@ -1,5 +1,4 @@
 generalizar bebederos:
 * preguntar bebedero seleccionado actual 
-* agregar opcion bebedero seleccionado en el paquete
-* ver opcion bebedero seleccionado en slave y tomar datos desde los sensores correspondientes
+* seleccionar esp32 slave correspondiente al bebedero actual
 * recibir datos y actualizar bebedero actual
