@@ -9,8 +9,10 @@ void set_current_water_level_value(int value, int cattle_waterer_selected);
 void set_current_water_temperature_value(float value, int cattle_waterer_selected);
 void set_current_date(int cattle_waterer_selected);
 void set_NTP_server();
-void backup_current_date(int cattle_waterer_selected);
+void backup_current_data(int cattle_waterer_selected);
 //void get_user_selected();
 int get_cattle_waterer_selected();
+//void set_days_without_fill(int cattle_waterer_selected);
+String get_last_backup_date(int cattle_waterer_selected);
 
 #endif

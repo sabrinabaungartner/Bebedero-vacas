@@ -19,6 +19,7 @@ void update_status_cattle_waterer() {
   set_current_water_level_value((int) water_value, cattle_waterer_selected);
   set_current_water_temperature_value(water_temperature, cattle_waterer_selected);
   set_current_date(cattle_waterer_selected);
+  //set_days_without_fill(cattle_waterer_selected);
 }
 
 void funcion_timer() {
@@ -28,7 +29,7 @@ void funcion_timer() {
   }
 
   if (seconds == 10) {
-    backup_current_date(cattle_waterer_selected);
+    backup_current_data(cattle_waterer_selected);
   }
 
   if (seconds == 15) {

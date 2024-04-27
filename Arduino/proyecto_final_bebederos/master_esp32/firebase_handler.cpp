@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include "firebase_handler.h"
 #include <WiFi.h>
 //#include <FirebaseESP32.h>
@@ -7,7 +8,6 @@
 #include "addons/RTDBHelper.h" // Provide the RTDB payload printing info and other helper functions.
 #include "time.h"
 #include <ArduinoJson.h>
-#include <Arduino.h>
 
 FirebaseData fbdo; // Firebase Data object
 FirebaseAuth auth;
@@ -63,14 +63,12 @@ void set_NTP_server() {
 
 void set_current_water_level_value(int value, int cattle_waterer_selected) {
   if (Firebase.ready()) {
-    //Firebase.setInt(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data/water_level", value);
     Firebase.RTDB.setInt(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/current_data/water_level", value);
   }
 }
 
 void set_current_water_temperature_value(float value, int cattle_waterer_selected) {
   if (Firebase.ready()) {
-    //Firebase.setFloat(fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_1/current_data/water_temperature", value);
     Firebase.RTDB.setFloat(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/current_data/water_temperature", value);
   }
 }
@@ -109,42 +107,57 @@ int get_next_backup_struct(int cattle_waterer_selected) {
   return 0;
 }
 
-void set_next_backup_to_modify(int value, int cattle_waterer_selected) {
-  Firebase.RTDB.setInt(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/backup_data/next_backup_to_modify", value);
+void set_current_data_into_backup(int year, int month, int day, int hour, int minute, int second, int cattle_waterer_selected) {
+  if (Firebase.ready()) {
+      char datetime_str[20];
+      sprintf(datetime_str, "%04d%02d%02d_%02d%02d%02d",
+              year, month, day,
+              hour, minute, second);
+
+      String firebasePath = "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/last_backup_modified";
+      Firebase.RTDB.setString(&fbdo, firebasePath.c_str(), datetime_str);
+      Serial.println("Último backup modificado almacenado en Firebase: " + firebasePath);
+  }
 }
 
-void backup_current_date(int cattle_waterer_selected) {
+void backup_current_data(int cattle_waterer_selected) {
   if (Firebase.ready()) {
-    next_backup = get_next_backup_struct(cattle_waterer_selected);
-
-    String path = "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/backup_data/backup_" + String(next_backup);
-    Serial.print("path: ");
-    Serial.println(path);
-
-    // Crear un objeto JSON para almacenar los datos recibidos
-    FirebaseJson json;
-    
-    // Check if the path exists, create it if it doesn't
-    /*if (!Firebase.get(fbdo, path)) {
-      // Path does not exist, create it
-      Firebase.set(fbdo, path, nullptr);
-    }*/
-    
-    // Save current data intp backup
-    if (Firebase.RTDB.getJSON(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/current_data")) {
-      if (fbdo.dataType() == "json") {
-        if (json.setJsonData(fbdo.payload())) {
-          if (Firebase.RTDB.setJSON(&fbdo, path, &json)) {
-            Serial.println("Datos JSON respaldados correctamente.");
-          } else {
-            Serial.println("Error al respaldar los datos JSON.");
-          }
-        }
+      struct tm timeinfo;
+      if (!getLocalTime(&timeinfo)) {
+          Serial.println("Failed to obtain time");
+          return;
       }
-    }
 
-    next_backup = (next_backup + 1) % MAX_BACKUPS;
-    set_next_backup_to_modify(next_backup, cattle_waterer_selected);
+      // Store date and time
+      int year = timeinfo.tm_year + 1900;
+      int month = timeinfo.tm_mon + 1;
+      int day = timeinfo.tm_mday;
+      int hour = timeinfo.tm_hour;
+      int minute = timeinfo.tm_min;
+      int second = timeinfo.tm_sec;
+
+      // Make backup string with date and time 
+      char backupPath[100];
+      sprintf(backupPath, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_%d/backup_data/backup_%04d%02d%02d_%02d%02d%02d",
+              cattle_waterer_selected,
+              year, month, day,
+              hour, minute, second);
+
+      // JSON object to save current params
+      FirebaseJson json;
+      if (Firebase.RTDB.getJSON(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/current_data")) {
+          if (fbdo.dataType() == "json") {
+              if (json.setJsonData(fbdo.payload())) {
+                  if (Firebase.RTDB.setJSON(&fbdo, backupPath, &json)) {
+                      Serial.println("Datos JSON respaldados correctamente en: " + String(backupPath));
+                      // Store date and time in Firebase backup
+                      set_current_data_into_backup(year, month, day, hour, minute, second, cattle_waterer_selected);
+                  } else {
+                      Serial.println("Error al respaldar los datos JSON.");
+                  }
+              }
+          }
+      }
   }
 }
 
@@ -152,7 +165,6 @@ int get_cattle_waterer_selected() {
   if (Firebase.RTDB.getInt(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_selected")) {
     if(fbdo.dataType()=="int"){
       return fbdo.intData();
-      //cattle_waterer_selected = fbdo.to<String>();
     } else {
       Serial.println("error get_cattle_waterer_selected");
     }
