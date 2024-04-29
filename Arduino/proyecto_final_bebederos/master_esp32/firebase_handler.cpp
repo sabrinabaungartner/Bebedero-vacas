@@ -3,11 +3,13 @@
 #include <WiFi.h>
 //#include <FirebaseESP32.h>
 #include <Firebase_ESP_Client.h>
+#include <TimeLib.h>  // Para makeTime y now
 #include "credentials_firebase.h"
 #include "addons/TokenHelper.h" // Provide the token generation process info.
 #include "addons/RTDBHelper.h" // Provide the RTDB payload printing info and other helper functions.
 #include "time.h"
 #include <ArduinoJson.h>
+#include <vector>
 
 FirebaseData fbdo; // Firebase Data object
 FirebaseAuth auth;
@@ -171,4 +173,122 @@ int get_cattle_waterer_selected() {
   }
 
   return 0;
+}
+
+/*void check_and_delete_old_backups(int cattle_waterer_selected) {
+  if (Firebase.ready()) {
+      
+    String backupPath = "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/backup_data";
+
+    FirebaseJson backups;
+    if (Firebase.RTDB.getJSON(&fbdo, backupPath)) {
+      if (fbdo.dataType() == "json") {
+        if (backups.setJsonData(fbdo.payload())) {
+          size_t backupCount = backups.iteratorBegin();
+          
+          for (size_t i = 0; i < backupCount; ++i) {
+              // Obtener el valor del backup en la posición actual
+              FirebaseJson::IteratorValue backup = backups.valueAt(i);
+              
+              // Obtener la clave (nombre del backup) y el valor (datos del backup)
+              String backupKey = backup.key.c_str();
+              Serial.print("backupkey: ");
+              Serial.println(backupKey);*/
+              //FirebaseJson backupData = backup.value;
+              
+              /*String date = backupData["date"].to<String>();
+              Serial.print("Backup Key: ");
+              Serial.println(backupKey);
+              Serial.print("Date: ");
+              Serial.println(date);*/
+              
+              // Por ejemplo, puedes implementar lógica para eliminar backups antiguos
+              // if (daysWithoutFilling > 7) {
+              //     Firebase.RTDB.deleteNode(backupPath + "/" + backupKey);
+              // }
+         /* }
+          
+          backups.iteratorEnd(); // Liberar memoria utilizada durante la iteración
+        } else {Serial.println("!backups.setJsonData in check_and_delete_old_backups");} 
+      } else {Serial.println("!dataType in check_and_delete_old_backups");}
+    } else {Serial.println("!Firebase.RTDB.getJSON in check_and_delete_old_backups");}
+  } else {Serial.println("!firebase.ready in check_and_delete_old_backups");}
+}*/
+
+// Función para calcular si han pasado 20 minutos entre dos fechas
+bool hasElapsedTwentyMinutes(struct tm previousTime, struct tm currentTime) {
+  // Convertir las fechas a tiempo en segundos desde el Epoch
+  time_t prevTimeSeconds = mktime(&previousTime);
+  time_t currTimeSeconds = mktime(&currentTime);
+
+  // Calcular el tiempo transcurrido en segundos
+  double elapsedTimeSeconds = difftime(currTimeSeconds, prevTimeSeconds);
+
+  // Convertir el tiempo transcurrido a minutos
+  int elapsedTimeMinutes = elapsedTimeSeconds / 60;
+
+  // Verificar si han pasado al menos 20 minutos
+  return (elapsedTimeMinutes >= 20);
+}
+
+void update_days_without_filling(int cattle_waterer_selected) {
+  struct tm timeinfo;
+  if (!getLocalTime(&timeinfo)) {
+    Serial.println("Failed to obtain time");
+    return;
+  }
+
+  // Retrieve the last filled date from Firebase
+  if (Firebase.RTDB.getString(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/last_filling_date")) {
+    const char* last_filled_date = fbdo.stringData().c_str();  // Obtiene el último dato llenado como const char*
+
+    int year, month, day, hour, minute, second;
+    sscanf(last_filled_date, "%4d%2d%2d_%2d%2d%2d", &year, &month, &day, &hour, &minute, &second);
+
+    Serial.print("Year: ");
+    Serial.println(year);
+    Serial.print("Month: ");
+    Serial.println(month);
+    Serial.print("Day: ");
+    Serial.println(day);
+    Serial.print("Hour: ");
+    Serial.println(hour);
+    Serial.print("Minute: ");
+    Serial.println(minute);
+    Serial.print("Second: ");
+    Serial.println(second);
+
+    // Crear la estructura de tiempo para la última fecha registrada
+    struct tm lastFilledTime = {0};
+    lastFilledTime.tm_year = year - 1900;  // Ajustar el año
+    lastFilledTime.tm_mon = month - 1;     // Ajustar el mes
+    lastFilledTime.tm_mday = day;
+    lastFilledTime.tm_hour = hour;
+    lastFilledTime.tm_min = minute;
+    lastFilledTime.tm_sec = second;
+
+    if (hasElapsedTwentyMinutes(lastFilledTime, timeinfo)) {
+      if (Firebase.ready()) {
+        if (Firebase.RTDB.getString(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/last_backup_modified")) {
+          String last_backup = fbdo.stringData();
+          Serial.print("Last backup modified: ");
+          Serial.println(last_backup);
+          if (Firebase.RTDB.getInt(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/backup_data/backup_" + last_backup + "/days_without_filling")) {
+            int days_without_filling = fbdo.intData();
+            Serial.print("Days without filling from backup: ");
+            Serial.println(days_without_filling);
+            days_without_filling += 1;
+            if (Firebase.RTDB.setInt(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/current_data/days_without_filling", days_without_filling)) {
+              Serial.print("Updated days without filling in Firebase. Days: ");
+              Serial.println(days_without_filling);
+            } else {Serial.println("error 3");}
+            
+          } else {Serial.println("error 1");}
+        } else {Serial.println("error");}
+        
+      }
+    }
+  } else {
+    Serial.println("Failed to retrieve last filled date from Firebase");
+  }
 }
