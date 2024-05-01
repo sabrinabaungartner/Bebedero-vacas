@@ -11,7 +11,7 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
     private val mDatabase: DatabaseReference = FirebaseDatabase.getInstance().reference // Get database reference
 
     override fun getMaxWaterTemperature(listener: (Double) -> Unit) {
-        val maxWaterTemperatureRef = mDatabase.child("parametros").child("temperatura_maxima") // Get max temperature reference
+        val maxWaterTemperatureRef = mDatabase.child("UsersData").child("zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2").child("cattle_waterer_1").child("parametros").child("max_water_temperature") // Get max temperature reference
 
         // Listen to changes in max water temperature value
         maxWaterTemperatureRef.addValueEventListener(object : ValueEventListener {
@@ -27,14 +27,14 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
     }
 
     override fun getWaterTemperatures(listener: (List<Double>) -> Unit) {
-        val backupsRef = mDatabase.child("datos_backup") // Get reference of backup water temperature values
+        val backupsRef = mDatabase.child("UsersData").child("zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2").child("cattle_waterer_1").child("backup_data") // Get reference of backup water temperature values
 
         backupsRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val temperatures = mutableListOf<Double>()
 
                 for (backupSnapshot in dataSnapshot.children) { // Iterate over each backup
-                    val temperature = backupSnapshot.child("temperatura_agua").getValue(Double::class.java)
+                    val temperature = backupSnapshot.child("water_temperature").getValue(Double::class.java)
                     if (temperature != null) { // Check if the temperature is available in the backup
                         temperatures.add(temperature)
                     }
@@ -50,7 +50,7 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
     }
 
     override fun getWaterLevels(listener: (List<Double>) -> Unit) {
-        val backupsRef = mDatabase.child("datos_backup") // Get reference to backup values
+        val backupsRef = mDatabase.child("UsersData").child("zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2").child("cattle_waterer_1").child("backup_data") // Get reference to backup values
 
         // Listener
         backupsRef.addValueEventListener(object : ValueEventListener {
@@ -59,7 +59,7 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
 
                 // Iterate above backups
                 for (backupSnapshot in dataSnapshot.children) {
-                    val level = backupSnapshot.child("nivel_agua").getValue(Double::class.java)
+                    val level = backupSnapshot.child("water_level").getValue(Double::class.java)
                     if (level != null) {
                         levelValues.add(level)
                     }
@@ -74,24 +74,24 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
         })
     }
 
-    override fun getMaxWaterLevel(listener: (Double) -> Unit) {
-        val maxWaterLevelRef = mDatabase.child("parametros").child("nivel_agua_minimo") //Ref maxWaterLevel
+    override fun getMinWaterLevel(listener: (Double) -> Unit) {
+        val minWaterLevelRef = mDatabase.child("UsersData").child("zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2").child("cattle_waterer_1").child("parametros").child("min_water_level") //Ref maxWaterLevel
 
         // listener max water level
-        maxWaterLevelRef.addValueEventListener(object : ValueEventListener {
+        minWaterLevelRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val maxWaterLevel = dataSnapshot.getValue(Double::class.java) ?: 0.0 // get max water level
-                listener(maxWaterLevel) // call callback with value obtained
+                val minWaterLevel = dataSnapshot.getValue(Double::class.java) ?: 0.0 // get min water level
+                listener(minWaterLevel) // call callback with value obtained
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                Log.d("FirebaseDatabaseHandler", "Error in getMaxWaterLevel function")
+                Log.d("FirebaseDatabaseHandler", "Error in getMinWaterLevel function")
             }
         })
     }
 
     override fun getWaterQuality(listener: (Int) -> Unit) {
-        val currentWaterQuality = mDatabase.child("data_actual").child("dias_sin_rellenar") //Ref dias_sin_rellenar
+        val currentWaterQuality = mDatabase.child("UsersData").child("zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2").child("cattle_waterer_1").child("current_data").child("days_without_filling") //Ref days_without_filling
 
         // Listener when water quality value changes
         currentWaterQuality.addValueEventListener(object : ValueEventListener {
@@ -107,7 +107,7 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
     }
 
     override fun getWaterMaxDaysWithoutFill(listener: (Int) -> Unit) {
-        val currentMaxDaysWithoutFill = mDatabase.child("parametros").child("dias_max_sin_rellenar") //Ref dias_sin_rellenar
+        val currentMaxDaysWithoutFill = mDatabase.child("UsersData").child("zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2").child("cattle_waterer_1").child("parametros").child("max_days_without_filling") //Ref max_days_without_filling
 
         // Agregar el listener para la temperatura máxima
         currentMaxDaysWithoutFill.addValueEventListener(object : ValueEventListener {
@@ -123,7 +123,7 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
     }
 
     override fun getWaterMedDaysWithoutFill(listener: (Int) -> Unit) {
-        val currentMedDaysWithoutFill = mDatabase.child("parametros").child("dias_med_sin_rellenar") //Ref dias_sin_rellenar
+        val currentMedDaysWithoutFill = mDatabase.child("UsersData").child("zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2").child("cattle_waterer_1").child("parametros").child("med_days_without_filling") //Ref dias_sin_rellenar
 
         // Agregar el listener para la temperatura máxima
         currentMedDaysWithoutFill.addValueEventListener(object : ValueEventListener {
@@ -139,7 +139,7 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
     }
 
     override fun setMaxWaterTemperature(value: Double) {
-        val maxWaterTemperatureRef = mDatabase.child("parametros").child("temperatura_maxima") // Reference to max temperature
+        val maxWaterTemperatureRef = mDatabase.child("UsersData").child("zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2").child("cattle_waterer_1").child("parametros").child("max_water_temperature") // Reference to max temperature
 
         // Set the new max water temperature value in Firebase
         maxWaterTemperatureRef.setValue(value)
@@ -152,7 +152,7 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
     }
 
     override fun setWaterMaxDaysWithoutFill(value: Int) {
-        val maxDaysWithoutFill = mDatabase.child("parametros").child("dias_max_sin_rellenar") // Reference to max temperature
+        val maxDaysWithoutFill = mDatabase.child("UsersData").child("zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2").child("cattle_waterer_1").child("parametros").child("max_days_without_filling") // Reference to max_days_without_filling
 
         // Set the new max days without fill value in Firebase
         maxDaysWithoutFill.setValue(value)
@@ -165,7 +165,7 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
     }
 
     override fun setWaterMedDaysWithoutFill(value: Int) {
-        val medDaysWithoutFill = mDatabase.child("parametros").child("dias_med_sin_rellenar") // Reference to max temperature
+        val medDaysWithoutFill = mDatabase.child("UsersData").child("zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2").child("cattle_waterer_1").child("parametros").child("med_days_without_filling") // Reference to med_days_without_filling
 
         // Set the new max days without fill value in Firebase
         medDaysWithoutFill.setValue(value)

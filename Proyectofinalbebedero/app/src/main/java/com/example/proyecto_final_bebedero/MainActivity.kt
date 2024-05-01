@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
     private val GROUP_KEY_BEBEDERO = "group_app_bebedero"
 
     private var maxTemperature: Double = 0.0
-    private var maxWaterLevel: Double = 0.0
+    private var minWaterLevel: Double = 0.0
     private var waterQuality: Int = 1
     private var maxDaysWithoutFill: Int = 5
     private var medDaysWithoutFill:Int = 2
@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
 
         listenForChangesOnWaterTemperatureMaxAndValues()
 
-        listenForChangesOnWaterLevelMaxAndValues()
+        listenForChangesOnWaterLevelMinAndValues()
 
         listenForChangesOnWaterQualityValues()
 
@@ -168,9 +168,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun listenForChangesOnWaterLevelMaxAndValues() {
-        firebaseDatabaseInterface.getMaxWaterLevel { waterLevel ->
-            maxWaterLevel = waterLevel
+    private fun listenForChangesOnWaterLevelMinAndValues() {
+        firebaseDatabaseInterface.getMinWaterLevel { waterLevel ->
+            minWaterLevel = waterLevel
             updateWaterLevelValues()
         }
 
@@ -209,9 +209,11 @@ class MainActivity : AppCompatActivity() {
     private fun listenToChangesOnSeekBarProgressWaterTemperature(seekBar: SeekBar, progressTextView: TextView) {
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                progressTextView.text = progress.toString() // Update TextView text
+                if (fromUser) {
+                    progressTextView.text = progress.toString() // Update TextView text
 
-                firebaseDatabaseInterface.setMaxWaterTemperature(progress.toDouble()) // Update value on Firebase
+                    firebaseDatabaseInterface.setMaxWaterTemperature(progress.toDouble()) // Update value on Firebase
+                }
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar) { } // Method required but not used
@@ -223,12 +225,14 @@ class MainActivity : AppCompatActivity() {
     private fun listenToChangesOnSeekBarProgressWaterQuality(seekBar: SeekBar, progressTextView: TextView) {
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                progressTextView.text = progress.toString() // Update TextView text
+                if (fromUser) {
+                    progressTextView.text = progress.toString() // Update TextView text
 
-                firebaseDatabaseInterface.setWaterMaxDaysWithoutFill(progress) // Update value on Firebase
-                val auxMedDaysWithoutFill: Int = progress/2
-                if (auxMedDaysWithoutFill == 1){firebaseDatabaseInterface.setWaterMedDaysWithoutFill(progress/2)}
-                else {firebaseDatabaseInterface.setWaterMedDaysWithoutFill(1)}
+                    firebaseDatabaseInterface.setWaterMaxDaysWithoutFill(progress) // Update value on Firebase
+                    val auxMedDaysWithoutFill: Int = progress/2
+                    if (auxMedDaysWithoutFill == 1){firebaseDatabaseInterface.setWaterMedDaysWithoutFill(progress/2)}
+                    else {firebaseDatabaseInterface.setWaterMedDaysWithoutFill(1)}
+                }
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar) { } // Method required but not used
@@ -274,15 +278,18 @@ class MainActivity : AppCompatActivity() {
                 Log.d("MainActivity", "Nivel promedio agua: $averageWaterLevel")
 
                 // Calculate percentage and update progressBar
-                val progressBarPercentageWater = ((averageWaterLevel * 100) / maxWaterLevel).toInt()
+                var progressBarPercentageWater = ((averageWaterLevel * 100) / minWaterLevel).toInt()
+                if (progressBarPercentageWater > 100) {
+                    progressBarPercentageWater = 100
+                }
                 Log.d("MainActivity", "Porcentaje water level: $progressBarPercentageWater")
                 progressBarWaterLevel.progress = progressBarPercentageWater
                 progressBarWaterLevelText.text = "${progressBarPercentageWater}%"
 
                 val waterLevelMessage = when {
-                    progressBarPercentageWater < 34 -> "Nivel de agua: excelente"
-                    progressBarPercentageWater < 68 -> "Nivel de agua: estable"
-                    else -> "Rellenar bebedero"
+                    progressBarPercentageWater < 50 -> "Rellenar bebedero"
+                    progressBarPercentageWater < 80 -> "Nivel de agua: estable"
+                    else -> "Nivel de agua: excelente"
                 }
                 textViewWaterLevel.text = waterLevelMessage
 
