@@ -24,14 +24,16 @@
         android:id="@+id/appTitleTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Inserte nombre de app"
-        android:textColor="#FFFFFF"
-        android:textSize="26sp"
-        android:typeface="serif"
+        android:text="Control de bebedero"
+        android:textColor="@color/violet"
+        android:textSize="30sp"
         app:layout_constraintStart_toEndOf="@id/menuButton"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
         tools:ignore="HardcodedText" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

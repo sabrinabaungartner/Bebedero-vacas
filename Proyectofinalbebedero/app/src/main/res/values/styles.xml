@@ -1,0 +1,7 @@
+<resources>
+    <!-- Estilo de la aplicación -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Cambiar color de la barra de notificaciones -->
+        <item name="android:statusBarColor">@color/violet</item>
+    </style>
+</resources>

@@ -4,40 +4,97 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <RelativeLayout
+        android:id="@+id/containerBackground"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="0dp">
+
+        <!-- Background login -->
+        <ImageView
+            android:id="@+id/imageViewBackground"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+        android:src="@drawable/background2"
+        android:scaleType="centerCrop"
+            android:contentDescription="background_login"
+            tools:ignore="HardcodedText" />
+
+        <!-- App Icon -->
+        <ImageView
+            android:id="@+id/imageViewIcon"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="280dp"
+            android:contentDescription="icon"
+            android:src="@drawable/icon_app"
+            tools:ignore="HardcodedText" />
+
+        <!-- Text below the Icon -->
+        <TextView
+            android:id="@+id/textViewDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/imageViewBackground"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="70dp"
+            android:text="Bievenido a la app del bebedero"
+            android:textColor="@color/violet"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif"
+            android:gravity="center"
+            android:textSize="30sp"
+            tools:ignore="HardcodedText" />
+
+    </RelativeLayout>
+
+    <!-- Text field for email -->
     <EditText
         android:id="@+id/editTextEmail"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:hint="Correo Electrónico"
-        android:inputType="textEmailAddress"
-        android:layout_marginTop="16dp"
+        android:layout_below="@id/containerBackground"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
         android:layout_marginEnd="16dp"
         android:autofillHints=""
-        tools:ignore="HardcodedText" />
+        android:hint="Correo Electrónico"
+        android:inputType="textEmailAddress"
+        tools:ignore="HardcodedText,TextContrastCheck" />
 
+    <!-- Text field for password -->
     <EditText
         android:id="@+id/editTextPassword"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:hint="Contraseña"
-        android:inputType="textPassword"
         android:layout_below="@id/editTextEmail"
-        android:layout_marginTop="8dp"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:autofillHints=""
-        tools:ignore="HardcodedText" />
+        android:hint="Contraseña"
+        android:inputType="textPassword"
+        tools:ignore="HardcodedText,TextContrastCheck" />
 
+    <!-- Sign in button -->
     <Button
         android:id="@+id/buttonLogin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Iniciar Sesión"
         android:layout_below="@id/editTextPassword"
-        android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
         android:layout_marginEnd="16dp"
-        tools:ignore="HardcodedText" />
-
+        android:backgroundTint="@color/violet"
+        android:gravity="center"
+        android:paddingStart="20dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="10dp"
+        android:shape="oval"
+        android:text="Iniciar Sesión"
+        android:textColor="#FFFFFF"
+        tools:ignore="HardcodedText,TextContrastCheck" />
 </RelativeLayout>
