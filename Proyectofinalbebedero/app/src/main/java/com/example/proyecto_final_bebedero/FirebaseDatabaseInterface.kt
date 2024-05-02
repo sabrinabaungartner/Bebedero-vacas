@@ -20,4 +20,6 @@ interface FirebaseDatabaseInterface {
     fun setWaterMaxDaysWithoutFill(value: Int)
 
     fun setWaterMedDaysWithoutFill(value: Int)
+
+    fun setDateOfLastFilling()
 }

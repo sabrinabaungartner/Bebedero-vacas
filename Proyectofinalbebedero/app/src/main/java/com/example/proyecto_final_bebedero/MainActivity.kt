@@ -104,8 +104,8 @@ class MainActivity : AppCompatActivity() {
 
             mainHandler.postDelayed({
                 fillButton.isEnabled = true
-
-            }, 2000) // 2000 miliseconds = 2 seconds
+                firebaseDatabaseInterface.setDateOfLastFilling()
+            }, 5000) // 5000 miliseconds = 5 seconds
         }
     }
 

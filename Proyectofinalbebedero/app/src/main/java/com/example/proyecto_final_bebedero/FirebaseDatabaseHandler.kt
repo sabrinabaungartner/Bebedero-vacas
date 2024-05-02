@@ -6,6 +6,9 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
     private val mDatabase: DatabaseReference = FirebaseDatabase.getInstance().reference // Get database reference
@@ -174,6 +177,28 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
             }
             .addOnFailureListener { e ->
                 Log.d("FirebaseDatabaseHandler", "Error updating med days without fill", e)
+            }
+    }
+
+    override fun setDateOfLastFilling() {
+        val date = Date() // Get actual date and time
+
+        // Define the desired format
+        val sdf = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
+
+        val formattedDateTime = sdf.format(date) // Format actual date and time
+
+        Log.d("FechaHora", "Fecha y Hora: $formattedDateTime")
+
+        val lastFillingDate = mDatabase.child("UsersData").child("zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2").child("cattle_waterer_1").child("last_filling_date") // Reference to last_filling_date
+
+        // Set the new max water temperature value in Firebase
+        lastFillingDate.setValue(formattedDateTime)
+            .addOnSuccessListener {
+                Log.d("FirebaseDatabaseHandler", "date of last filling updated successfully to $formattedDateTime")
+            }
+            .addOnFailureListener { e ->
+                Log.d("FirebaseDatabaseHandler", "Error updating date of last filling", e)
             }
     }
 }
