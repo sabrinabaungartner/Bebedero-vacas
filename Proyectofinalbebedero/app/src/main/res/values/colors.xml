@@ -5,4 +5,6 @@
     <color name="gris_claro">#CCCCCC</color>
     <color name="violet">#7681f0</color>
     <color name="dark_gray">#303030</color>
+    <color name="colorButtonEnabled">@color/violet</color>
+    <color name="colorButtonDisabled">@color/gris_claro</color>
 </resources>

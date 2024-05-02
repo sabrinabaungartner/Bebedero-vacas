@@ -1,9 +1,11 @@
 package com.example.proyecto_final_bebedero
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.SeekBar
@@ -12,6 +14,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.navigation.NavigationView
+import android.os.Handler
+import android.os.Looper
 
 class MainActivity : AppCompatActivity() {
     private val firebaseDatabaseInterface: FirebaseDatabaseInterface = FirebaseDatabaseHandler()
@@ -52,6 +56,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navView: NavigationView
     private lateinit var menuButton: ImageButton
+    private lateinit var fillButton: Button
+    val mainHandler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,10 +93,20 @@ class MainActivity : AppCompatActivity() {
         drawerLayout = findViewById(R.id.drawer_layout)
         navView = findViewById(R.id.nav_view)
         menuButton = findViewById(R.id.menuButton)
+        fillButton = findViewById(R.id.buttonFill)
         seekBarWaterTemperature = findViewById(R.id.seekBarWaterTemperature) // Reference to SeekBar value
         progressTextViewWaterTemperature = findViewById(R.id.seekBarValueTextViewWaterTemperature) // Reference to SeekBar text
         seekBarWaterQuality = findViewById(R.id.seekBarWaterQuality)
         progressTextViewWaterQuality = findViewById(R.id.seekBarValueTextViewQuality)
+
+        fillButton.setOnClickListener {
+            fillButton.isEnabled = false
+
+            mainHandler.postDelayed({
+                fillButton.isEnabled = true
+
+            }, 2000) // 2000 miliseconds = 2 seconds
+        }
     }
 
     private fun navigationDrawerSetup() {
