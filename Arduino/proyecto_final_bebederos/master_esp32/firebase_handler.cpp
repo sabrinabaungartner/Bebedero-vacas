@@ -122,6 +122,38 @@ void set_current_data_into_backup(int year, int month, int day, int hour, int mi
   }
 }
 
+void set_last_filling_date(int cattle_waterer_selected) {
+  if (Firebase.ready()) {
+      struct tm timeinfo;
+      if (!getLocalTime(&timeinfo)) {
+          Serial.println("Failed to obtain time");
+          return;
+      }
+
+      // Store date and time
+      int year = timeinfo.tm_year + 1900;
+      int month = timeinfo.tm_mon + 1;
+      int day = timeinfo.tm_mday;
+      int hour = timeinfo.tm_hour;
+      int minute = timeinfo.tm_min;
+      int second = timeinfo.tm_sec;
+
+      // Make backup string with date and time 
+      char last_filling_date_value[100];
+      sprintf(last_filling_date_value, "%04d%02d%02d_%02d%02d%02d",
+              year, month, day,
+              hour, minute, second);
+
+    if (Firebase.RTDB.setString(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/last_filling_date", last_filling_date_value)) {
+      Serial.println("Success on setting value of last_filling_date");
+    } else { 
+        Serial.println("Error setting value of last_filling_date");
+      }
+  } else {
+      Serial.println("Failed to set last_filling_date value in Firebase (Firebase not ready)");
+    }
+}
+
 void backup_current_data(int cattle_waterer_selected) {
   if (Firebase.ready()) {
       struct tm timeinfo;
@@ -290,5 +322,58 @@ void update_days_without_filling(int cattle_waterer_selected) {
     }
   } else {
     Serial.println("Failed to retrieve last filled date from Firebase");
+  }
+}
+
+int get_fill_waterer(int cattle_waterer_selected) {
+  if (Firebase.ready()) {
+    if (Firebase.RTDB.getInt(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/fill_waterer")) {
+      Serial.println("Success on getting value of fill_waterer");
+      if(fbdo.dataType()=="int"){
+        return fbdo.intData();
+      } else {
+        Serial.println("error get_fill_waterer datatype");
+      }
+    } else { 
+        Serial.println("Error getting value of fill_waterer");
+    }
+  } else {
+    Serial.println("Failed to retrieve fill_waterer value from Firebase (Firebase not ready)");
+  }
+}
+
+void set_fill_waterer(int value, int cattle_waterer_selected) {
+  if (Firebase.ready()) {
+    if (Firebase.RTDB.setInt(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/fill_waterer", value)) {
+      Serial.println("Success on setting value of fill_waterer");
+    } else { 
+        Serial.println("Error setting value of fill_waterer");
+      }
+  } else {
+    Serial.println("Failed to set fill_waterer value in Firebase (Firebase not ready)");
+  }
+}
+
+void set_is_water_pump_enabled(int value, int cattle_waterer_selected) {
+  if (Firebase.ready()) {
+    if (Firebase.RTDB.setInt(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/is_water_pump_enabled", value)) {
+      Serial.println("Success on setting value of is_water_pump_enabled");
+    } else { 
+        Serial.println("Error setting value of is_water_pump_enabled");
+      }
+  } else {
+    Serial.println("Failed to set is_water_pump_enabled value in Firebase (Firebase not ready)");
+  }
+}
+
+void reset_days_without_filling(int cattle_waterer_selected) {
+  if (Firebase.ready()) {
+    if (Firebase.RTDB.setInt(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/current_data/days_without_filling", 0)) {
+      Serial.println("Success on setting value of days_without_filling");
+    } else { 
+        Serial.println("Error setting value of days_without_filling");
+      }
+  } else {
+    Serial.println("Failed to set days_without_filling value in Firebase (Firebase not ready)");
   }
 }

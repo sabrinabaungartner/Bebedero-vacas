@@ -6,9 +6,9 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
     private val mDatabase: DatabaseReference = FirebaseDatabase.getInstance().reference // Get database reference
@@ -180,25 +180,37 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
             }
     }
 
-    override fun setDateOfLastFilling() {
-        val date = Date() // Get actual date and time
+    override fun setFillWaterer(value: Int) {
+        val fillWatererReference = mDatabase.child("UsersData").child("zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2").child("cattle_waterer_1").child("fill_waterer") // Reference to fill_waterer
 
-        // Define the desired format
-        val sdf = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
-
-        val formattedDateTime = sdf.format(date) // Format actual date and time
-
-        Log.d("FechaHora", "Fecha y Hora: $formattedDateTime")
-
-        val lastFillingDate = mDatabase.child("UsersData").child("zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2").child("cattle_waterer_1").child("last_filling_date") // Reference to last_filling_date
-
-        // Set the new max water temperature value in Firebase
-        lastFillingDate.setValue(formattedDateTime)
+        fillWatererReference.setValue(value)
             .addOnSuccessListener {
-                Log.d("FirebaseDatabaseHandler", "date of last filling updated successfully to $formattedDateTime")
+                Log.d("FirebaseDatabaseHandler", "value of fill_waterer updated successfully to $value")
             }
             .addOnFailureListener { e ->
-                Log.d("FirebaseDatabaseHandler", "Error updating date of last filling", e)
+                Log.d("FirebaseDatabaseHandler", "Error updating value of fill_waterer", e)
             }
     }
+
+    override fun getFillWaterer(listener: (Int) -> Unit) {
+        val fillWatererRef = mDatabase.child("UsersData").child("zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2").child("cattle_waterer_1").child("fill_waterer") // Reference to fill_waterer
+
+        // Listener to detect changes on fill_waterer value
+        fillWatererRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val fillWatererValue = snapshot.getValue(Int::class.java)
+                if (fillWatererValue != null) { // fill_waterer is not empty
+                    listener(fillWatererValue)
+                } else {
+                    listener(0) // The default value is zero
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // Handle operation cancellation
+                Log.d("FirebaseDatabaseHandler", "Error on lecture fill_waterer")
+            }
+        })
+    }
 }
+

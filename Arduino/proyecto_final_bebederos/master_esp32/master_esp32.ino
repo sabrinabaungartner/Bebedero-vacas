@@ -6,10 +6,12 @@
 
 // Variables
 int seconds = 0;
+int seconds_filling_waterer = 0;
 uint8_t water_value = 0;
 float water_temperature = 0.0;
-int cattle_waterer_selected = 0;
+int cattle_waterer_selected = 1;
 int days_without_fill_waterer = 0;
+int filling_waterer = 0;
 
 // Declaration of functions
 void iniciar_timer();
@@ -25,18 +27,37 @@ void update_status_cattle_waterer() {
 }
 
 void funcion_timer() {
-  if (seconds == 5) {
+  if (seconds == 2) {
     check_wifi();
-    cattle_waterer_selected = get_cattle_waterer_selected();
-    //check_and_delete_old_backups(cattle_waterer_selected);
+    //cattle_waterer_selected = get_cattle_waterer_selected();
   }
 
-  if (seconds == 10) {
+  if (seconds == 5) {
+    if (get_fill_waterer(cattle_waterer_selected) == 1) {
+      if (seconds_filling_waterer == 0) {
+        set_is_water_pump_enabled(1, cattle_waterer_selected);
+        filling_waterer = 1;
+      }
+
+      if (seconds_filling_waterer == 1) {
+        seconds_filling_waterer = 0;
+        set_is_water_pump_enabled(0, cattle_waterer_selected); // Android app detects this change and use it to enable "rellenar bebedero" button
+        set_fill_waterer(0, cattle_waterer_selected);
+        set_last_filling_date(cattle_waterer_selected);
+        reset_days_without_filling(cattle_waterer_selected);
+        filling_waterer = 0;
+      }
+      
+      seconds_filling_waterer += 1;
+      seconds = 0;
+    }
+  }
+
+  if ((seconds == 10) && !filling_waterer) {
     backup_current_data(cattle_waterer_selected);
   }
 
-  if (seconds == 15) {
-    //get_user_selected();
+  if ((seconds == 15) && !filling_waterer) {
     request_water_level_temperature();
     receive_water_level_temperature();
     water_value = receive_requested_water_level();
@@ -47,7 +68,7 @@ void funcion_timer() {
     Serial.println(water_temperature);
   }
 
-  if (seconds == 20) {
+  if ((seconds == 20) && !filling_waterer) {
     update_status_cattle_waterer();
     seconds = 0;
   }

@@ -2,7 +2,7 @@
 #define BT_HANDLER_H
 #include <Arduino.h>
 
-void set_bluetooth_configuration();
+int set_bluetooth_configuration();
 //void request_water_level();
 void request_water_level_temperature();
 void receive_water_level_temperature();

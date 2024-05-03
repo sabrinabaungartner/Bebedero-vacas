@@ -21,5 +21,7 @@ interface FirebaseDatabaseInterface {
 
     fun setWaterMedDaysWithoutFill(value: Int)
 
-    fun setDateOfLastFilling()
+    fun setFillWaterer(value: Int)
+
+    fun getFillWaterer(listener: (Int) -> Unit)
 }

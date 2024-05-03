@@ -45,7 +45,7 @@ void callback(esp_spp_cb_event_t event, esp_spp_cb_param_t *param){ // it works 
   }
 }
 
-void set_bluetooth_configuration() {
+int set_bluetooth_configuration() {
   pinMode(LED_BT_BLUE, OUTPUT);
 
   SerialBT.register_callback(callback);
@@ -55,6 +55,8 @@ void set_bluetooth_configuration() {
   #ifndef USE_NAME
     SerialBT.setPin(pin);
   #endif
+
+  return 1;
 }
 
 bool connect_to_slave() {

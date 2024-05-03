@@ -86,6 +86,8 @@ class MainActivity : AppCompatActivity() {
         listenToChangesOnSeekBarProgressWaterTemperature(seekBarWaterTemperature, progressTextViewWaterTemperature)
 
         listenToChangesOnSeekBarProgressWaterQuality(seekBarWaterQuality, progressTextViewWaterQuality)
+
+        listenForFillWatererChanges()
     }
 
     private fun setupMainView() {
@@ -101,11 +103,18 @@ class MainActivity : AppCompatActivity() {
 
         fillButton.setOnClickListener {
             fillButton.isEnabled = false
+            firebaseDatabaseInterface.setFillWaterer(1)
+        }
+    }
 
-            mainHandler.postDelayed({
+    private fun listenForFillWatererChanges() {
+        firebaseDatabaseInterface.getFillWaterer { fillWatererValue ->
+            if (fillWatererValue == 1) {
+                Log.d("MainActivity", "El bebedero está siendo llenado")
+            } else {
+                Log.d("MainActivity", "El bebedero no está siendo llenado")
                 fillButton.isEnabled = true
-                firebaseDatabaseInterface.setDateOfLastFilling()
-            }, 5000) // 5000 miliseconds = 5 seconds
+            }
         }
     }
 
