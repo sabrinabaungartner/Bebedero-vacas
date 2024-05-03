@@ -1,4 +1,0 @@
-generalizar bebederos:
-* preguntar bebedero seleccionado actual 
-* seleccionar esp32 slave correspondiente al bebedero actual
-* recibir datos y actualizar bebedero actual

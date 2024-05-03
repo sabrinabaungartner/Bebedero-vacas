@@ -1,0 +1,13 @@
+generalizar bebederos:
+* preguntar bebedero seleccionado actual 
+* seleccionar esp32 slave correspondiente al bebedero actual
+* recibir datos y actualizar bebedero actual
+
+Changes:
+* Android ---> deshabilitar notificaciones push mientras se esta llenando el bebedero (o es perar 40 segundos para las dos primeras mediciones)
+* Arduino ---> Chequear funcion calidad del agua --> updatea de forma incorrecta una vez cumplidos los 20 minutos
+* Android ---> tomar backups para calcular promedios desde la fecha en adelante que indique la variable last_fill
+* Android ---> graficos (para el final)
+* Arduino ---> borrar printlns y acomodar checks de wifi activo y bt
+* Arduino ---> ver posibilidad de agregar bomba de agua?
+* General ---> acomodar parametro del nivel del agua, ya que al usar uint8_t ya no toma valores tan grandes como antes
