@@ -7,7 +7,6 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 
 class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
@@ -83,26 +82,54 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
     }
 
     override fun getWaterLevels(listener: (List<Double>) -> Unit) {
-        val backupsRef = mDatabase.child("UsersData").child("zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2").child("cattle_waterer_1").child("backup_data") // Get reference to backup values
+        val backupsRef = mDatabase.child("UsersData").child("zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2").child("cattle_waterer_1").child("backup_data")
 
-        // Listener
-        backupsRef.addValueEventListener(object : ValueEventListener {
+        // Obtener la fecha de referencia
+        val lastFillingDateRef = mDatabase.child("UsersData").child("zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2").child("cattle_waterer_1").child("last_filling_date")
+
+        lastFillingDateRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val levelValues = mutableListOf<Double>()
+                val lastFillingDateString = dataSnapshot.getValue(String::class.java)
+                if (lastFillingDateString != null) {
+                    // Convertir la fecha de referencia a un formato adecuado (timestamp)
+                    val lastFillingDate = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).parse(lastFillingDateString)
 
-                // Iterate above backups
-                for (backupSnapshot in dataSnapshot.children) {
-                    val level = backupSnapshot.child("water_level").getValue(Double::class.java)
-                    if (level != null) {
-                        levelValues.add(level)
-                    }
+                    // Listener para obtener los backups
+                    backupsRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(dataSnapshot: DataSnapshot) {
+                            val levels = mutableListOf<Double>()
+
+                            // Iterar sobre cada backup
+                            for (backupSnapshot in dataSnapshot.children) {
+                                val backupDate = backupSnapshot.child("date").getValue(String::class.java)
+                                if (backupDate != null) {
+                                    // Convertir la fecha del backup a un formato adecuado
+                                    val backupDateTime = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).parse(backupDate)
+
+                                    // Comparar la fecha del backup con la fecha de referencia
+                                    if (backupDateTime != null && backupDateTime.after(lastFillingDate)) {
+                                        // Obtener el nivel si la fecha del backup es posterior a la fecha de referencia
+                                        val level = backupSnapshot.child("water_level").getValue(Double::class.java)
+                                        Log.d("dates", "lasFillingDate $lastFillingDate and backupDateTime $backupDateTime")
+                                        if (level != null) {
+                                            levels.add(level)
+                                        }
+                                    }
+                                }
+                            }
+
+                            listener(levels) // Callback con los niveles filtrados
+                        }
+
+                        override fun onCancelled(databaseError: DatabaseError) {
+                            Log.d("FirebaseDatabaseHandler", "Error en getWaterLevels")
+                        }
+                    })
                 }
-
-                listener(levelValues) // Callback with the list of water levels obtained
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                Log.d("FirebaseDatabaseHandler", "Error in getWaterLevels function")
+                Log.d("FirebaseDatabaseHandler", "Error en getWaterTemperatures")
             }
         })
     }
