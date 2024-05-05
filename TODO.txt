@@ -4,7 +4,6 @@ generalizar bebederos:
 * recibir datos y actualizar bebedero actual
 
 Changes:
-* Android ---> deshabilitar notificaciones push mientras se esta llenando el bebedero (o es perar 40 segundos para las dos primeras mediciones)
 * Arduino ---> Chequear funcion calidad del agua --> updatea de forma incorrecta una vez cumplidos los 20 minutos
 * Android ---> graficos (para el final)
 * Arduino ---> borrar printlns y acomodar checks de wifi activo y bt
@@ -17,3 +16,7 @@ Listo:
 * Android ---> tomar backups para calcular promedios desde la fecha en adelante que indique la variable last_fill
           |
           ---> hecho para las temperaturas y para el nivel
+* Android ---> deshabilitar notificaciones push mientras se esta llenando el bebedero (o esperar 40 segundos para las dos primeras mediciones)
+          |
+          ---> en realidad, cuando se notifica una vez, ya directamente se desactivan. Cuando se rellena el bebedero, si estaban deshabilitadas se habilitan de nuevo.
+               Si cambian los valores de los parametros desde la app, se vuelven a habilitar nuevamente.

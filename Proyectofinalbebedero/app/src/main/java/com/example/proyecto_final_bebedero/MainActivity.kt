@@ -1,7 +1,6 @@
 package com.example.proyecto_final_bebedero
 
 import android.annotation.SuppressLint
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
@@ -14,8 +13,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.navigation.NavigationView
-import android.os.Handler
-import android.os.Looper
 
 class MainActivity : AppCompatActivity() {
     private val firebaseDatabaseInterface: FirebaseDatabaseInterface = FirebaseDatabaseHandler()
@@ -26,7 +23,9 @@ class MainActivity : AppCompatActivity() {
     private var minWaterLevel: Double = 0.0
     private var waterQuality: Int = 1
     private var maxDaysWithoutFill: Int = 5
-    private var medDaysWithoutFill:Int = 2
+    private var medDaysWithoutFill: Int = 2
+    private var userNotifiedAboutWaterTemperature: Boolean = false
+    private var userNotifiedAboutWaterQuality: Boolean = false
     private val qualityLectureError: Int = 0
 
     // Vars for water temperature
@@ -57,7 +56,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navView: NavigationView
     private lateinit var menuButton: ImageButton
     private lateinit var fillButton: Button
-    val mainHandler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -114,6 +112,8 @@ class MainActivity : AppCompatActivity() {
             } else {
                 Log.d("MainActivity", "El bebedero no está siendo llenado")
                 fillButton.isEnabled = true
+                userNotifiedAboutWaterTemperature = false
+                userNotifiedAboutWaterQuality = false
             }
         }
     }
@@ -185,6 +185,7 @@ class MainActivity : AppCompatActivity() {
     private fun listenForChangesOnWaterTemperatureMaxAndValues() {
         firebaseDatabaseInterface.getMaxWaterTemperature { temperature ->
             maxTemperature = temperature
+            userNotifiedAboutWaterTemperature = false
             updateWaterTemperatureValues()
         }
 
@@ -207,6 +208,7 @@ class MainActivity : AppCompatActivity() {
     private fun listenForChangesOnWaterQualityValues() {
         firebaseDatabaseInterface.getWaterQuality { quality ->
             waterQuality = quality
+            userNotifiedAboutWaterQuality = false
             updateWaterQuality()
         }
 
@@ -282,9 +284,10 @@ class MainActivity : AppCompatActivity() {
                 progressBarWaterTemperature.progress = progressBarPercentage
                 progressBarWaterTemperatureText.text = "${progressBarPercentage}%"
 
-                if (progressBarPercentage >= 90) {
+                if (progressBarPercentage >= 90 && !userNotifiedAboutWaterTemperature) {
                     notificationHandler.showNotificationTemperature("TEMPERATURA BEBEDERO", "Revisar bebedero", "La temperatura del agua se encuentra en estado crítico. Considere cambiar el agua del bebedero.")
                     notificationHandler.showSummaryNotification()
+                    userNotifiedAboutWaterTemperature = true
                 }
             } else {
                 Log.d("MainActivity", "No temperature data available")
@@ -339,8 +342,11 @@ class MainActivity : AppCompatActivity() {
             waterQuality < medDaysWithoutFill  -> "Calidad del agua: excelente"
             waterQuality < maxDaysWithoutFill -> "Calidad del agua: buena"
             else -> {
-                notificationHandler.showNotificationQuality("CALIDAD DEL AGUA", "Revisar bebedero", "La calidad del agua no es buena. Considere cambiar el agua del bebedero.")
-                notificationHandler.showSummaryNotification()
+                if (!userNotifiedAboutWaterQuality) {
+                    userNotifiedAboutWaterQuality = false
+                    notificationHandler.showNotificationQuality("CALIDAD DEL AGUA", "Revisar bebedero", "La calidad del agua no es buena. Considere cambiar el agua del bebedero.")
+                    notificationHandler.showSummaryNotification()
+                }
                 "Cambiar agua del bebedero"
             }
         }
