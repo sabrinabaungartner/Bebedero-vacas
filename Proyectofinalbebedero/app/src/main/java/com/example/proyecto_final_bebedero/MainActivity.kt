@@ -337,33 +337,42 @@ class MainActivity : AppCompatActivity() {
                 Log.d("MainActivity", "No water level data available")
                 textViewWaterLevel.text = "Datos del nivel de agua no disponibles"
                 progressBarWaterLevel.progress = 0
-                progressBarWaterLevelText.text = "Nan"
+                progressBarWaterLevelText.text = "NaN"
             }
         }
     }
 
     @SuppressLint("SetTextI18n")
     private fun updateWaterQuality() {
-        // Calculate percentage and update progressBar
-        val progressBarWaterQualityValue = ((waterQuality * 100) / maxDaysWithoutFill)
-        Log.d("MainActivity", "Porcentaje water quality: $progressBarWaterQualityValue")
-        progressBarWaterQuality.progress = progressBarWaterQualityValue
-        progressBarWaterQualityText.text = "${progressBarWaterQualityValue}%"
+        if (waterQuality != 99) {
+            // Calculate percentage and update progressBar
+            val progressBarWaterQualityValue = ((waterQuality * 100) / maxDaysWithoutFill)
+            Log.d("MainActivity", "Porcentaje water quality: $progressBarWaterQualityValue")
+            progressBarWaterQuality.progress = progressBarWaterQualityValue
+            progressBarWaterQualityText.text = "${progressBarWaterQualityValue}%"
 
-        val waterQualityMessage: String = when {
-            waterQuality < medDaysWithoutFill  -> "Calidad del agua: excelente"
-            waterQuality < maxDaysWithoutFill -> "Calidad del agua: buena"
-            else -> {
-                if (!userNotifiedAboutWaterQuality) {
-                    userNotifiedAboutWaterQuality = true
-                    notificationHandler.showNotificationQuality("CALIDAD DEL AGUA", "Revisar bebedero", "La calidad del agua no es buena. Considere cambiar el agua del bebedero.")
-                    notificationHandler.showSummaryNotification()
+            val waterQualityMessage: String = when {
+                waterQuality < medDaysWithoutFill  -> "Calidad del agua: excelente"
+                waterQuality < maxDaysWithoutFill -> "Calidad del agua: buena"
+                else -> {
+                    if (!userNotifiedAboutWaterQuality) {
+                        userNotifiedAboutWaterQuality = true
+                        notificationHandler.showNotificationQuality("CALIDAD DEL AGUA", "Revisar bebedero", "La calidad del agua no es buena. Considere cambiar el agua del bebedero.")
+                        notificationHandler.showSummaryNotification()
+                    }
+                    "Cambiar agua del bebedero"
                 }
-                "Cambiar agua del bebedero"
             }
+
+            textViewWaterQuality.text = waterQualityMessage
         }
 
-        textViewWaterQuality.text = waterQualityMessage
+        else {
+            Log.d("MainActivity", "No water level data available")
+            textViewWaterQuality.text = "Datos de la calidad del agua no disponibles"
+            progressBarWaterQuality.progress = 0
+            progressBarWaterQualityText.text = "NaN"
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

@@ -11,7 +11,7 @@ Changes:
 * General ---> acomodar parametro del nivel del agua, ya que al usar uint8_t ya no toma valores tan grandes como antes
           |
           ---> le puse 300, aunque dependiendo del bebedero que haga voy a ponerle mas o menos
-
+* Arduino ---> en vez de tomar una nueva fecha para el backup, tomar la fecha que hay en date en current_data y usarla para "backup_xx_xx"
 
 
 
@@ -24,3 +24,4 @@ Listo:
           |
           ---> luego de los 20 segundos se toma la primer medición, sino mientras tanto queda en NaN. Conviene medir mientras se va rellenando el bebedero?
                es decir, cuando se empieza a llenar modificar la variable last_filled y empezar a tomar valores de los backups desde ahí
+* Android ---> revisar get un 99 (retorno error al leer) en water quality
