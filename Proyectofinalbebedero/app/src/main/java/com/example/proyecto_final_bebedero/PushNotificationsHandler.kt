@@ -17,6 +17,7 @@ class PushNotificationsHandler(private val context: Context): PushNotificationsI
         const val SUMMARY_ID = 0
         const val TEMPERATURE_ID = 1
         const val QUALITY_ID = 2
+        const val LEVEL_ID = 3
     }
 
     override fun createNotificationChannel(title: String, channelDescription: String) {
@@ -55,6 +56,19 @@ class PushNotificationsHandler(private val context: Context): PushNotificationsI
             .setGroup(GROUP_KEY_BEBEDERO)
 
         checkAndRequirePermissionsToNotify(QUALITY_ID, builder)
+    }
+
+    override fun showNotificationWaterLevel(title: String, shortTextToShow: String, largeTextToShow: String) {
+        val builder = NotificationCompat.Builder(context, MY_CHANNEL_ID)
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setContentTitle(title)
+            .setContentText(shortTextToShow)
+            .setStyle(NotificationCompat.BigTextStyle()
+                .bigText(largeTextToShow))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setGroup(GROUP_KEY_BEBEDERO)
+
+        checkAndRequirePermissionsToNotify(LEVEL_ID, builder)
     }
 
     override fun showSummaryNotification() {

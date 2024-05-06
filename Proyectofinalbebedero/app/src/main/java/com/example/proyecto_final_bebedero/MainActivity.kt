@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity() {
     private var medDaysWithoutFill: Int = 2
     private var userNotifiedAboutWaterTemperature: Boolean = false
     private var userNotifiedAboutWaterQuality: Boolean = false
+    private var userNotifiedAboutWaterLevel: Boolean = false
     private val qualityLectureError: Int = 0
 
     // Vars for water temperature
@@ -320,6 +321,15 @@ class MainActivity : AppCompatActivity() {
                     else -> "Nivel de agua: excelente"
                 }
                 textViewWaterLevel.text = waterLevelMessage
+
+                // Check if water level is critical and show notification
+                if (progressBarPercentageWater < 50) {
+                    notificationHandler.showNotificationWaterLevel(
+                        "NIVEL DE AGUA BAJO",
+                        "Nivel de agua bajo",
+                        "El nivel de agua en el bebedero es bajo. Por favor, considere rellenar el bebedero."
+                    )
+                }
 
             } else {
                 Log.d("MainActivity", "No water level data available")

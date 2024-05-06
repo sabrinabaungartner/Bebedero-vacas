@@ -5,5 +5,6 @@ interface PushNotificationsInterface {
     //fun showNotification(title: String, shortTextToShow: String, largeTextToShow: String, groupKey: String)
     fun showNotificationTemperature(title: String, shortTextToShow: String, largeTextToShow: String)
     fun showNotificationQuality(title: String, shortTextToShow: String, largeTextToShow: String)
+    fun showNotificationWaterLevel(title: String, shortTextToShow: String, largeTextToShow: String)
     fun showSummaryNotification()
 }
