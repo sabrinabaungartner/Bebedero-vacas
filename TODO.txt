@@ -14,6 +14,9 @@ Changes:
 * Android ---> tomar backups para calcular promedios desde la fecha en adelante que indique la variable last_fill
           |
           ---> hecho para las temperaturas, no para nivel
+          |
+          ---> luego de los 20 segundos se toma la primer medición, sino mientras tanto queda en NaN. Conviene medir mientras se va rellenando el bebedero?
+               es decir, cuando se empieza a llenar modificar la variable last_filled y empezar a tomar valores de los backups desde ahí
 
 Listo:
 * Android ---> deshabilitar notificaciones push mientras se esta llenando el bebedero (o esperar 40 segundos para las dos primeras mediciones)

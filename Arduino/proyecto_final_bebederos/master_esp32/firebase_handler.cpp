@@ -144,7 +144,7 @@ void set_last_filling_date(int cattle_waterer_selected) {
               year, month, day,
               hour, minute, second);
 
-    if (Firebase.RTDB.setString(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/last_filling_date", last_filling_date_value)) {
+    if (Firebase.RTDB.setString(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/backup_data/last_filling_date", last_filling_date_value)) {
       Serial.println("Success on setting value of last_filling_date");
     } else { 
         Serial.println("Error setting value of last_filling_date");
@@ -271,7 +271,7 @@ void update_days_without_filling(int cattle_waterer_selected) {
   }
 
   // Retrieve the last filled date from Firebase
-  if (Firebase.RTDB.getString(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/last_filling_date")) {
+  if (Firebase.RTDB.getString(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/backup_data/last_filling_date")) {
     const char* last_filled_date = fbdo.stringData().c_str();  // Obtiene el último dato llenado como const char*
 
     int year, month, day, hour, minute, second;
