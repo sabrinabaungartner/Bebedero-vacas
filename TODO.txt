@@ -12,7 +12,8 @@ Changes:
           |
           ---> le puse 300, aunque dependiendo del bebedero que haga voy a ponerle mas o menos
 * Arduino ---> en vez de tomar una nueva fecha para el backup, tomar la fecha que hay en date en current_data y usarla para "backup_xx_xx"
-
+* Arduino ---> no pedir nada ni enviar a firebase hasta que no se establezca la comunicación por bt. Ver lo que ocurre con los primeros valores, ya que las primeras 
+               mediciones siempre devuelven 0, hasta que se reacomoda todo
 
 
 Listo:

@@ -325,7 +325,7 @@ class MainActivity : AppCompatActivity() {
 
                 // Check if water level is critical and show notification
                 if ((progressBarPercentageWater < 50) && !userNotifiedAboutWaterLevel) {
-                    userNotifiedAboutWaterQuality = true
+                    userNotifiedAboutWaterLevel = true
                     notificationHandler.showNotificationWaterLevel(
                         "NIVEL DE AGUA BAJO",
                         "Nivel de agua bajo",
