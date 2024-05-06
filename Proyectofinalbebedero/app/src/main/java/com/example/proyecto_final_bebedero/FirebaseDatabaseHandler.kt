@@ -31,48 +31,35 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
     override fun getWaterTemperatures(listener: (List<Double>) -> Unit) {
         val backupsRef = mDatabase.child("UsersData").child("zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2").child("cattle_waterer_1").child("backup_data")
 
-        // Obtener la fecha de referencia
-        val lastFillingDateRef = mDatabase.child("UsersData").child("zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2").child("cattle_waterer_1").child("last_filling_date")
-
-        lastFillingDateRef.addListenerForSingleValueEvent(object : ValueEventListener {
+        // Listener to get backups and last_filling_date
+        backupsRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val lastFillingDateString = dataSnapshot.getValue(String::class.java)
+                val temperatures = mutableListOf<Double>()
+                val lastFillingDateString = dataSnapshot.child("last_filling_date").getValue(String::class.java)
                 if (lastFillingDateString != null) {
-                    // Convertir la fecha de referencia a un formato adecuado (timestamp)
                     val lastFillingDate = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).parse(lastFillingDateString)
 
-                    // Listener para obtener los backups
-                    backupsRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onDataChange(dataSnapshot: DataSnapshot) {
-                            val temperatures = mutableListOf<Double>()
+                    // Iterate over backups
+                    for (backupSnapshot in dataSnapshot.children) {
+                        val backupDate = backupSnapshot.child("date").getValue(String::class.java)
+                        if (backupDate != null) {
 
-                            // Iterar sobre cada backup
-                            for (backupSnapshot in dataSnapshot.children) {
-                                val backupDate = backupSnapshot.child("date").getValue(String::class.java)
-                                if (backupDate != null) {
-                                    // Convertir la fecha del backup a un formato adecuado
-                                    val backupDateTime = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).parse(backupDate)
+                            val backupDateTime = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).parse(backupDate)
 
-                                    // Comparar la fecha del backup con la fecha de referencia
-                                    if (backupDateTime != null && backupDateTime.after(lastFillingDate)) {
-                                        // Obtener la temperatura si la fecha del backup es posterior a la fecha de referencia
-                                        val temperature = backupSnapshot.child("water_temperature").getValue(Double::class.java)
-                                        Log.d("dates", "lasFillingDate $lastFillingDate and backupDateTime $backupDateTime")
-                                        if (temperature != null) {
-                                            temperatures.add(temperature)
-                                        }
-                                    }
+                            // Compare two dates
+                            if (backupDateTime != null && backupDateTime.after(lastFillingDate)) {
+
+                                val temperature = backupSnapshot.child("water_temperature").getValue(Double::class.java)
+                                Log.d("dates", "lasFillingDate $lastFillingDate and backupDateTime $backupDateTime")
+                                if (temperature != null) {
+                                    temperatures.add(temperature)
                                 }
                             }
-
-                            listener(temperatures) // Callback con las temperaturas filtradas
                         }
-
-                        override fun onCancelled(databaseError: DatabaseError) {
-                            Log.d("FirebaseDatabaseHandler", "Error en getWaterTemperatures")
-                        }
-                    })
+                    }
                 }
+
+                listener(temperatures) // Callback with filtered temperatures
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
