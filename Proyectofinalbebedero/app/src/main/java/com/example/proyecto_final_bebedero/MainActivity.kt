@@ -115,6 +115,7 @@ class MainActivity : AppCompatActivity() {
                 fillButton.isEnabled = true
                 userNotifiedAboutWaterTemperature = false
                 userNotifiedAboutWaterQuality = false
+                userNotifiedAboutWaterLevel = false
             }
         }
     }
@@ -323,7 +324,8 @@ class MainActivity : AppCompatActivity() {
                 textViewWaterLevel.text = waterLevelMessage
 
                 // Check if water level is critical and show notification
-                if (progressBarPercentageWater < 50) {
+                if ((progressBarPercentageWater < 50) && !userNotifiedAboutWaterLevel) {
+                    userNotifiedAboutWaterQuality = true
                     notificationHandler.showNotificationWaterLevel(
                         "NIVEL DE AGUA BAJO",
                         "Nivel de agua bajo",
@@ -353,7 +355,7 @@ class MainActivity : AppCompatActivity() {
             waterQuality < maxDaysWithoutFill -> "Calidad del agua: buena"
             else -> {
                 if (!userNotifiedAboutWaterQuality) {
-                    userNotifiedAboutWaterQuality = false
+                    userNotifiedAboutWaterQuality = true
                     notificationHandler.showNotificationQuality("CALIDAD DEL AGUA", "Revisar bebedero", "La calidad del agua no es buena. Considere cambiar el agua del bebedero.")
                     notificationHandler.showSummaryNotification()
                 }
