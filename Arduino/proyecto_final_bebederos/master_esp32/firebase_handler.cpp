@@ -156,47 +156,6 @@ void set_last_filling_date(int cattle_waterer_selected) {
   }
 }
 
-/*void backup_current_data(int cattle_waterer_selected) {
-  if (Firebase.ready()) {
-      struct tm timeinfo;
-      if (!getLocalTime(&timeinfo)) {
-          Serial.println("Failed to obtain time");
-          return;
-      }
-
-      // Store date and time
-      int year = timeinfo.tm_year + 1900;
-      int month = timeinfo.tm_mon + 1;
-      int day = timeinfo.tm_mday;
-      int hour = timeinfo.tm_hour;
-      int minute = timeinfo.tm_min;
-      int second = timeinfo.tm_sec;
-
-      // Make backup string with date and time 
-      char backupPath[100];
-      sprintf(backupPath, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_%d/backup_data/backup_%04d%02d%02d_%02d%02d%02d",
-              cattle_waterer_selected,
-              year, month, day,
-              hour, minute, second);
-
-      // JSON object to save current params
-      FirebaseJson json;
-      if (Firebase.RTDB.getJSON(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/current_data")) {
-          if (fbdo.dataType() == "json") {
-              if (json.setJsonData(fbdo.payload())) {
-                  if (Firebase.RTDB.setJSON(&fbdo, backupPath, &json)) {
-                      Serial.println("Datos JSON respaldados correctamente en: " + String(backupPath));
-                      // Store date and time in Firebase backup
-                      set_current_data_into_backup(year, month, day, hour, minute, second, cattle_waterer_selected);
-                  } else {
-                      Serial.println("Error al respaldar los datos JSON.");
-                  }
-              }
-          }
-      }
-  }
-}*/
-
 void backup_current_data(int cattle_waterer_selected) {
   if (Firebase.ready()) {
     FirebaseJson json;  // JSON object to save current params
