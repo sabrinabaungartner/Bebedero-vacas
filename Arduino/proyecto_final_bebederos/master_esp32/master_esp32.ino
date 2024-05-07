@@ -44,7 +44,7 @@ void funcion_timer() {
         set_is_water_pump_enabled(0, cattle_waterer_selected); // Android app detects this change and use it to enable "rellenar bebedero" button
         set_fill_waterer(0, cattle_waterer_selected);
         set_last_filling_date(cattle_waterer_selected);
-        reset_days_without_filling(cattle_waterer_selected);
+        set_days_without_filling(0, cattle_waterer_selected);
         filling_waterer = 0;
       }
       
