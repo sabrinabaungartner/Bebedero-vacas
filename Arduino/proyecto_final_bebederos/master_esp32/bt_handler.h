@@ -3,10 +3,9 @@
 #include <Arduino.h>
 
 int set_bluetooth_configuration();
-//void request_water_level();
 void request_water_level_temperature();
 void receive_water_level_temperature();
-uint8_t receive_requested_water_level();
+int receive_requested_water_level();
 float receive_requested_water_temperature();
 
 #endif

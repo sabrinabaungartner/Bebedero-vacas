@@ -9,6 +9,6 @@
 
 void set_water_level_parameters();
 
-uint8_t read_water_level();
+int read_water_level();
 
 #endif

@@ -6,7 +6,7 @@
 #include "timer.h"
 
 // Variables
-int seconds = 0;
+uint8_t seconds = 0;
 
 void funcion_timer() {
   if (seconds == 2) {
@@ -32,7 +32,5 @@ void setup() {
 }
 
 void loop() {
-  //check_bluetooth_SPP_RxHandler();
-  //delay(2000);
   fnqueue_run();
 }

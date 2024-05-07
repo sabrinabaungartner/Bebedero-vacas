@@ -83,19 +83,10 @@ void create_package_to_send(uint8_t size, uint8_t message, uint8_t value) {
   pac_to_send.payload[0] = value;
   pac_to_send.payload[1] = value;
   pac_to_send.payload[2] = value;
+  pac_to_send.payload[3] = value;
+  pac_to_send.payload[4] = value;
+  pac_to_send.payload[5] = value;
 }
-
-/*void request_water_level() {
-  if (!slave_is_connected) {
-    while (!connect_to_slave()) {
-      delay(1000);
-    }
-  }
-  else {
-    create_package_to_send(SIZE_ARRAY, GET_WATER_LEVEL, NULO);
-    send_package();
-  }
-}*/
 
 void request_water_level_temperature() {
   if (!slave_is_connected) {
@@ -109,24 +100,18 @@ void request_water_level_temperature() {
   }
 }
 
-/*uint8_t receive_requested_water_level() {
-  uint8_t index = 0;
-  while (SerialBT.available()) {
-    received_array[index++] = SerialBT.read();
+int receive_requested_water_level() {
+  int reconstructed_value = 0;
+  for (size_t i = 0; i < sizeof(int); i++) { // i goes from 0 to 4
+    reconstructed_value |= (my_received_packet_struct.payload[i] << (i * 8));
   }
 
-  received_packet(&my_received_packet_struct, received_array);
-
-  return my_received_packet_struct.payload[0];
-}*/
-
-uint8_t receive_requested_water_level() {
-  return my_received_packet_struct.payload[0];
+  return reconstructed_value;
 }
 
 float receive_requested_water_temperature() {
-  uint8_t entera_uint8 = my_received_packet_struct.payload[1];
-  uint8_t decimal_uint8 = my_received_packet_struct.payload[2];
+  uint8_t entera_uint8 = my_received_packet_struct.payload[4];
+  uint8_t decimal_uint8 = my_received_packet_struct.payload[5];
 
   float entera_uint8_float = static_cast<float>(entera_uint8);
   float decimal_uint8_float = static_cast<float>(decimal_uint8) / 100;

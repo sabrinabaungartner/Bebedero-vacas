@@ -7,7 +7,7 @@
 #define ESCAPE_CHARACTER '/'
 
 extern String device_name;
-extern uint8_t data [];
+extern int data [];
 extern size_t dataLength;
 
 extern BluetoothSerial SerialBT;

@@ -7,7 +7,7 @@
 // Variables
 int seconds = 0;
 int seconds_filling_waterer = 0;
-uint8_t water_value = 0;
+int water_value = 0;
 float water_temperature = 0.0;
 int cattle_waterer_selected = 1;
 int days_without_fill_waterer = 0;
@@ -19,7 +19,7 @@ void funcion_timer();
 void update_status_cattle_waterer();
 
 void update_status_cattle_waterer() {
-  set_current_water_level_value((int) water_value, cattle_waterer_selected);
+  set_current_water_level_value(water_value, cattle_waterer_selected);
   set_current_water_temperature_value(water_temperature, cattle_waterer_selected);
   set_current_date(cattle_waterer_selected);
   //set_days_without_fill(cattle_waterer_selected);
