@@ -1,8 +1,6 @@
 #include "slave_serial_bt.h"
 #include "Arduino.h"
 #include "package.h"
-#include "water_level_sensor.h"
-#include "water_sensor_temperature.h"
 
 String device_name = "ESP32-BT-Slave";
 
@@ -35,7 +33,6 @@ void set_bluetooth_configuration() {
 void assemble_package(uint8_t size, uint8_t reply, int water_level, float water_temperature) {
   my_packet_to_send.length = size;
   my_packet_to_send.type_of_message = reply;
-  //my_packet_to_send.payload[0] = water_level;
 
   for (size_t i = 0; i < sizeof(int); i++) { // i goes from 0 to 4
     my_packet_to_send.payload[i] = (water_level >> (i * 8)) & 0xFF;
@@ -56,19 +53,25 @@ void send_package() {
   SerialBT.write(array_to_send, sizeof(array_to_send));
 }
 
-void bluetooth_SPP_TxHandler() {
-  assemble_package(SIZE_ARRAY, REPLY_ALL, read_water_level(), read_water_temperature());
-  send_package();
+void bluetooth_SPP_TxHandler(int water_level, float water_temperature) {
+  if (my_received_packet_struct.type_of_message == GET_ALL) {
+    assemble_package(SIZE_ARRAY, REPLY_ALL, water_level, water_temperature);
+    send_package();
+  }
 }
 
-void check_bluetooth_SPP_RxHandler() {
+uint8_t bluetooth_SPP_RxHandler() {
   uint8_t index = 0;
   if (SerialBT.available() > 0) {
-    while (SerialBT.available()) {
+    while (SerialBT.available() && (index < 10)) {
       received_array[index++] = SerialBT.read();
     }
 
     received_packet(&my_received_packet_struct, received_array);
-    bluetooth_SPP_TxHandler();
+    return 1;
+  }
+
+  else {
+    return 0;
   }
 }

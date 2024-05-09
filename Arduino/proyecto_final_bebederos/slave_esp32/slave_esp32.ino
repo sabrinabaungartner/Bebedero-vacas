@@ -7,12 +7,35 @@
 
 // Variables
 uint8_t seconds = 0;
+uint8_t request_received = 0;
+int water_level = 0;
+float water_temperature = 0.0;
+
+void read_from_sensors() {
+  water_level = read_water_level();
+  water_temperature = read_water_temperature();
+}
 
 void funcion_timer() {
   if (seconds == 2) {
-    check_bluetooth_SPP_RxHandler();
+    request_received = bluetooth_SPP_RxHandler();
+    if (request_received) {
+      read_from_sensors();
+      bluetooth_SPP_TxHandler(water_level, water_temperature);
+      request_received = 0;
+    }
     seconds = 0;
   }
+
+  /*if (seconds == 3 && request_received) {
+    read_from_sensors();
+  }
+
+  if (seconds == 4 && request_received) {
+    request_received = 0;
+    seconds = 0;
+    bluetooth_SPP_TxHandler(water_level, water_temperature);
+  }*/
 
   seconds += 1;
 }

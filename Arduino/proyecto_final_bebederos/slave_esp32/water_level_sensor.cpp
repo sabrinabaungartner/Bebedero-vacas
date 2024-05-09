@@ -15,7 +15,5 @@ int read_water_level() {
   value = analogRead(PIN_SIGNAL);
   delay(10);
   digitalWrite(POWER,LOW);
-  Serial.print("water level: ");
-  Serial.println(value);
   return value;
 }

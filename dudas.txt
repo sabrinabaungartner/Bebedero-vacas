@@ -1,0 +1,2 @@
+* delay(10) en slave
+* operación que hace función check_bluetooth_SPP_RxHandler(), si es mucha para una sola interrupción

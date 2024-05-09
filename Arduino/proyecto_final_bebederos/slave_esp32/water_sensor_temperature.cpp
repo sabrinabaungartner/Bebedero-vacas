@@ -12,9 +12,5 @@ void set_water_temperature() {
 float read_water_temperature() {
   DS18B20.requestTemperatures();       // Send the command to get temperatures
   temp_c = DS18B20.getTempCByIndex(0);  // Read temperature in °C
-
-  Serial.print("Temperature: ");
-  Serial.print(temp_c);    // print the temperature in °C
-  Serial.print("°C");
   return temp_c;
 }
