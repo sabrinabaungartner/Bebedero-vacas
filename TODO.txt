@@ -14,7 +14,6 @@ Changes:
                mediciones siempre devuelven 0, hasta que se reacomoda todo
 * Arduino ---> ver la posibilidad de borrar los backups antiguos luego de un cierto tiempo
 * Android ---> si se llega al 100% en los progress bar, que se muestre el 100% y no más que eso
-* Android ---> revisar en la parte de backups cómo está comparando para tomar a partir de qué fecha, porque parece que no lo está haciendo bien
 
 
 Listo:
@@ -29,3 +28,7 @@ Listo:
 * Android ---> revisar get un 99 (retorno error al leer) en water quality
 * Arduino ---> en vez de tomar una nueva fecha para el backup, tomar la fecha que hay en date en current_data y usarla para "backup_xx_xx"
 * Arduino ---> Chequear funcion calidad del agua --> updatea de forma incorrecta una vez cumplidos los 20 minutos
+* Android ---> revisar en la parte de backups cómo está comparando para tomar a partir de qué fecha, porque parece que no lo está haciendo bien
+          |
+          ---> lo hace bien, lo que pasa que los porcentajes no están tan buenos. se los sacaría, creo que es mejor. Además, si hace el promedio después de varios
+               días, es posible que exista una diferencia de 2 o 3 grados con la temperatura actual 
