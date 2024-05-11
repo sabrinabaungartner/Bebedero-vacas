@@ -4,8 +4,6 @@
 #define MAX_BACKUPS 10
 
 void setup_wifi_firebase();
-//void check_wifi();
-bool check_wifi();
 void set_current_water_level_value(int value, int cattle_waterer_selected);
 void set_current_water_temperature_value(float value, int cattle_waterer_selected);
 void set_current_date(int cattle_waterer_selected);

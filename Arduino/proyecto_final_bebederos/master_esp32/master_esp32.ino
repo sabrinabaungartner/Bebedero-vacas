@@ -28,7 +28,6 @@ void update_status_cattle_waterer() {
 
 void funcion_timer() {
   if (seconds == 2) {
-    //wifi_is_connected = check_wifi();
     //cattle_waterer_selected = get_cattle_waterer_selected();
   }
 
