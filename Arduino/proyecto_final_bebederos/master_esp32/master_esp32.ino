@@ -8,10 +8,11 @@
 int seconds = 0;
 int seconds_filling_waterer = 0;
 int water_value = 0;
-float water_temperature = 0.0;
 int cattle_waterer_selected = 1;
 int days_without_fill_waterer = 0;
 int filling_waterer = 0;
+float water_temperature = 0.0;
+bool wifi_is_connected = false;
 
 // Declaration of functions
 void iniciar_timer();
@@ -22,13 +23,12 @@ void update_status_cattle_waterer() {
   set_current_water_level_value(water_value, cattle_waterer_selected);
   set_current_water_temperature_value(water_temperature, cattle_waterer_selected);
   set_current_date(cattle_waterer_selected);
-  //set_days_without_fill(cattle_waterer_selected);
   update_days_without_filling(cattle_waterer_selected);
 }
 
 void funcion_timer() {
   if (seconds == 2) {
-    check_wifi();
+    //wifi_is_connected = check_wifi();
     //cattle_waterer_selected = get_cattle_waterer_selected();
   }
 
@@ -54,10 +54,6 @@ void funcion_timer() {
   }
 
   if ((seconds == 10) && !filling_waterer) {
-    backup_current_data(cattle_waterer_selected);
-  }
-
-  if ((seconds == 15) && !filling_waterer) {
     request_water_level_temperature();
     receive_water_level_temperature();
     water_value = receive_requested_water_level();
@@ -68,8 +64,12 @@ void funcion_timer() {
     Serial.println(water_temperature);
   }
 
-  if ((seconds == 20) && !filling_waterer) {
+  if ((seconds == 15) && !filling_waterer) {
     update_status_cattle_waterer();
+  }
+
+  if ((seconds == 20) && !filling_waterer) {
+    backup_current_data(cattle_waterer_selected);
     seconds = 0;
   }
 
@@ -83,7 +83,7 @@ void iniciar_timer(){
 
 void setup() {
   Serial.begin(115200);
-  setup_wifi();
+  setup_wifi_firebase();
   set_NTP_server();
   set_bluetooth_configuration();
   fnqueue_init();

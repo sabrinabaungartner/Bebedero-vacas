@@ -59,13 +59,12 @@ int set_bluetooth_configuration() {
   return 1;
 }
 
-bool connect_to_slave() {
+void connect_to_slave() {
   #ifdef USE_NAME
     slave_is_connected = SerialBT.connect(slave_name);
   #else
     slave_is_connected = SerialBT.connect(address);
   #endif
-  return slave_is_connected;
 }
 
 void send_via_bt(uint8_t array[], uint8_t size_array) {
@@ -90,9 +89,7 @@ void create_package_to_send(uint8_t size, uint8_t message, uint8_t value) {
 
 void request_water_level_temperature() {
   if (!slave_is_connected) {
-    while (!connect_to_slave()) {
-      delay(1000);
-    }
+    connect_to_slave();
   }
   else {
     create_package_to_send(SIZE_ARRAY, GET_ALL, NULO);
