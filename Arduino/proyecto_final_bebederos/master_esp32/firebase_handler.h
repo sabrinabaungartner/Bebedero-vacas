@@ -9,7 +9,6 @@ void set_current_water_temperature_value(float value, int cattle_waterer_selecte
 void set_current_date(int cattle_waterer_selected);
 void set_NTP_server();
 void backup_current_data(int cattle_waterer_selected);
-//void get_user_selected();
 int get_cattle_waterer_selected();
 int get_fill_waterer(int cattle_waterer_selected);
 void set_fill_waterer(int value, int cattle_waterer_selected);

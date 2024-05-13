@@ -32,39 +32,44 @@ String master_name = "ESP32-BT-Master";
 bool slave_is_connected = false;
 
 // Callback function for Bluetooth
-void callback(esp_spp_cb_event_t event, esp_spp_cb_param_t *param){ // it works when passing data
-  if (event == ESP_SPP_OPEN_EVT) {
-    Serial.println("estoy en ESP_SPP_OPEN_EVT");
+void callback(esp_spp_cb_event_t event, esp_spp_cb_param_t *param){
+  if (event == ESP_SPP_OPEN_EVT) { // SPP Client connection open
+    Serial.println("A SPP client opens a connectionT");
     digitalWrite(LED_BT_BLUE, HIGH);
     slave_is_connected = true;
   }
 
-  if (event == ESP_SPP_CLOSE_EVT) {
+  if (event == ESP_SPP_CLOSE_EVT) { // SPP connection closed
+    Serial.println("A SPP connection is closed");
     digitalWrite(LED_BT_BLUE, LOW);
     slave_is_connected = false;
   }
 }
 
-int set_bluetooth_configuration() {
+void set_bluetooth_configuration() {
   pinMode(LED_BT_BLUE, OUTPUT);
 
   SerialBT.register_callback(callback);
 
   SerialBT.begin(master_name, true);
+  Serial.printf("The device \"%s\" started in master mode, make sure slave BT device is on!\n", master_name.c_str());
 
   #ifndef USE_NAME
     SerialBT.setPin(pin);
   #endif
 
-  return 1;
+  if (!connect_to_slave()) {
+    Serial.println("Failed to connect. Make sure remote device is available and in range, then restart app.");
+  }
 }
 
-void connect_to_slave() {
+bool connect_to_slave() {
   #ifdef USE_NAME
     slave_is_connected = SerialBT.connect(slave_name);
   #else
     slave_is_connected = SerialBT.connect(address);
   #endif
+  return slave_is_connected;
 }
 
 void send_via_bt(uint8_t array[], uint8_t size_array) {
@@ -85,6 +90,10 @@ void create_package_to_send(uint8_t size, uint8_t message, uint8_t value) {
   pac_to_send.payload[3] = value;
   pac_to_send.payload[4] = value;
   pac_to_send.payload[5] = value;
+}
+
+bool check_slave_is_connected() {
+  return slave_is_connected;
 }
 
 void request_water_level_temperature() {

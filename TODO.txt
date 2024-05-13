@@ -5,16 +5,15 @@ generalizar bebederos:
 
 Changes:
 * Android ---> graficos (para el final)
-* Arduino ---> borrar printlns y acomodar checks de wifi activo y bt
 * Arduino ---> ver posibilidad de agregar bomba de agua?
 * General ---> acomodar parametro del nivel del agua, ya que al usar uint8_t ya no toma valores tan grandes como antes
           |
           ---> le puse 300, aunque dependiendo del bebedero que haga voy a ponerle mas o menos
-* Arduino ---> no pedir nada ni enviar a firebase hasta que no se establezca la comunicación por bt. Ver lo que ocurre con los primeros valores, ya que las primeras 
-               mediciones siempre devuelven 0, hasta que se reacomoda todo
 * Arduino ---> ver la posibilidad de borrar los backups antiguos luego de un cierto tiempo
 * Android ---> si se llega al 100% en los progress bar, que se muestre el 100% y no más que eso
-
+* Arduino ---> si se corta internet mientras se rellena el bebedero, cómo hago para restaurar el flujo para hacer reset una vez que volvió el servicio?
+* Android ---> filtrar por ultimo rellenado, y a su vez filtrar con los ultimos 10 backups, así se obtienen datos más certeros.
+* Arduino ---> bajarle a los tiempos
 
 Listo:
 * Android ---> deshabilitar notificaciones push mientras se esta llenando el bebedero (o esperar 40 segundos para las dos primeras mediciones)
@@ -31,4 +30,15 @@ Listo:
 * Android ---> revisar en la parte de backups cómo está comparando para tomar a partir de qué fecha, porque parece que no lo está haciendo bien
           |
           ---> lo hace bien, lo que pasa que los porcentajes no están tan buenos. se los sacaría, creo que es mejor. Además, si hace el promedio después de varios
-               días, es posible que exista una diferencia de 2 o 3 grados con la temperatura actual 
+               días, es posible que exista una diferencia de 2 o 3 grados con la temperatura actual
+* Arduino ---> borrar printlns y acomodar checks de wifi activo y bt
+* Arduino ---> no pedir nada ni enviar a firebase hasta que no se establezca la comunicación por bt. Ver lo que ocurre con los primeros valores, ya que las primeras 
+               mediciones siempre devuelven 0, hasta que se reacomoda todo
+
+NOTAS:
+* Seteo en setup() la ultima vez que se rellenó el bebedero, para iniciar esa variable. Si el bebedero está vacío, se va a indicar que el
+nivel es bajo, y el sensor de temperatura si no tiene agua va a sensar la temperatura ambiente. Este comportamiento se va a replicar siempre, ya que así es su
+funcionamiento.
+* En master arduino ---> se chequea al comienzo en cada loop la comunicación bt. Si no está establecida, se intenta establecer y luego se repite el loop.
+Independientemente de si está establecida o no, se chequea si se está llenando el bebedero, ya que es prioridad.
+S la comunicación está establecida, se sigue con el flujo de trabajo (se piden valores, se setea current data, se chequean días sin rellenar, se hace el backup).

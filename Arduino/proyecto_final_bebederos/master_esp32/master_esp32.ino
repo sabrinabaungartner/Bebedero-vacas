@@ -18,6 +18,26 @@ bool wifi_is_connected = false;
 void iniciar_timer();
 void funcion_timer();
 void update_status_cattle_waterer();
+void request_and_receive_water_level_and_temperature();
+void reset_values_after_filling_waterer();
+
+void request_and_receive_water_level_and_temperature() {
+  request_water_level_temperature();
+  receive_water_level_temperature();
+  water_value = receive_requested_water_level();
+  water_temperature = receive_requested_water_temperature();
+  Serial.print("water level value: ");
+  Serial.println(water_value);
+  Serial.print("water level temperature: ");
+  Serial.println(water_temperature);
+}
+
+void reset_values_after_filling_waterer() {
+  set_is_water_pump_enabled(0, cattle_waterer_selected); // Android app detects this change and use it to enable "rellenar bebedero" button
+  set_fill_waterer(0, cattle_waterer_selected);
+  set_last_filling_date(cattle_waterer_selected);
+  set_days_without_filling(0, cattle_waterer_selected);
+}
 
 void update_status_cattle_waterer() {
   set_current_water_level_value(water_value, cattle_waterer_selected);
@@ -27,49 +47,44 @@ void update_status_cattle_waterer() {
 }
 
 void funcion_timer() {
-  if (seconds == 2) {
-    //cattle_waterer_selected = get_cattle_waterer_selected();
-  }
-
-  if (seconds == 5) {
-    if (get_fill_waterer(cattle_waterer_selected) == 1) {
-      if (seconds_filling_waterer == 0) {
-        set_is_water_pump_enabled(1, cattle_waterer_selected);
-        filling_waterer = 1;
-      }
-
-      if (seconds_filling_waterer == 1) {
-        seconds_filling_waterer = 0;
-        set_is_water_pump_enabled(0, cattle_waterer_selected); // Android app detects this change and use it to enable "rellenar bebedero" button
-        set_fill_waterer(0, cattle_waterer_selected);
-        set_last_filling_date(cattle_waterer_selected);
-        set_days_without_filling(0, cattle_waterer_selected);
-        filling_waterer = 0;
-      }
-      
-      seconds_filling_waterer += 1;
+  if (get_fill_waterer(cattle_waterer_selected) == 1) { // Check if it is necessary to fill waterer
+    if (filling_waterer == 0) {
+      set_is_water_pump_enabled(1, cattle_waterer_selected); // Enable water pump
+      filling_waterer = 1;
+      seconds = 0;
+    }
+    if ((filling_waterer == 1) && (seconds == 5)) {
+      reset_values_after_filling_waterer(); // At this time have passed 5 seconds
+      filling_waterer = 0;
       seconds = 0;
     }
   }
 
-  if ((seconds == 10) && !filling_waterer) {
-    request_water_level_temperature();
-    receive_water_level_temperature();
-    water_value = receive_requested_water_level();
-    water_temperature = receive_requested_water_temperature();
-    Serial.print("water level value: ");
-    Serial.println(water_value);
-    Serial.print("water level temperature: ");
-    Serial.println(water_temperature);
-  }
-
-  if ((seconds == 15) && !filling_waterer) {
-    update_status_cattle_waterer();
-  }
-
-  if ((seconds == 20) && !filling_waterer) {
-    backup_current_data(cattle_waterer_selected);
+  else {
+    if (!check_slave_is_connected()) {
+    Serial.println("Serial BT communicaton is not seted!");
+    connect_to_slave();
     seconds = 0;
+    }
+    
+    else {
+      /*if (seconds == 2) {
+        cattle_waterer_selected = get_cattle_waterer_selected();
+      }*/
+
+      if (seconds == 10) {
+        request_and_receive_water_level_and_temperature();
+      }
+
+      if (seconds == 15) {
+        update_status_cattle_waterer();
+      }
+
+      if (seconds == 20) {
+        backup_current_data(cattle_waterer_selected);
+        seconds = 0;
+      }
+    }
   }
 
   seconds += 1;
@@ -87,6 +102,7 @@ void setup() {
   set_bluetooth_configuration();
   fnqueue_init();
   iniciar_timer();
+  set_last_filling_date(cattle_waterer_selected);
 }
 
 void loop() {
