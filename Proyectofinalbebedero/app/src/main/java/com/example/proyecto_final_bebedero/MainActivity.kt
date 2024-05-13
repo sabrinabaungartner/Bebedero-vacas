@@ -295,7 +295,7 @@ class MainActivity : AppCompatActivity() {
                 Log.d("MainActivity", "No temperature data available")
                 progressBarWaterTemperatureText.text = "NaN"
                 progressBarWaterTemperature.progress = 0
-                textViewWaterTemperature.text = "Datos de temperatura no disponibles"
+                textViewWaterTemperature.text = "Recopilando datos de temperatura del agua..."
             }
         }
     }
@@ -335,7 +335,7 @@ class MainActivity : AppCompatActivity() {
 
             } else {
                 Log.d("MainActivity", "No water level data available")
-                textViewWaterLevel.text = "Datos del nivel de agua no disponibles"
+                textViewWaterLevel.text = "Recopilando datos del nivel de agua..."
                 progressBarWaterLevel.progress = 0
                 progressBarWaterLevelText.text = "NaN"
             }
@@ -369,7 +369,7 @@ class MainActivity : AppCompatActivity() {
 
         else {
             Log.d("MainActivity", "No water level data available")
-            textViewWaterQuality.text = "Datos de la calidad del agua no disponibles"
+            textViewWaterQuality.text = "Recopilando datos de la calidad del agua..."
             progressBarWaterQuality.progress = 0
             progressBarWaterQualityText.text = "NaN"
         }
@@ -390,7 +390,7 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("SetTextI18n")
     private fun showErrorWaterQualityData() {
         Log.d("MainActivity", "No water med quality data available")
-        textViewWaterQuality.text = "No hay datos de calidad del agua disponibles"
+        textViewWaterQuality.text = "Recopilando datos de la calidad del agua..."
         progressBarWaterQuality.progress = 0
         progressBarWaterQualityText.text = "NaN"
     }

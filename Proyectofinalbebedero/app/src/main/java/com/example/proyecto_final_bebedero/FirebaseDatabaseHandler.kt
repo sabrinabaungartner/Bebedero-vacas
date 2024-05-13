@@ -40,7 +40,7 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
                     val lastFillingDate = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).parse(lastFillingDateString)
 
                     // Iterate over backups
-                    for (backupSnapshot in dataSnapshot.children) {
+                    /*for (backupSnapshot in dataSnapshot.children) {
                         val backupDate = backupSnapshot.child("date").getValue(String::class.java)
                         if (backupDate != null) {
 
@@ -56,10 +56,35 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
                                 }
                             }
                         }
+                    }*/
+
+                    val sortedBackups = dataSnapshot.children.mapNotNull { backupSnapshot ->
+                        val backupDate = backupSnapshot.child("date").getValue(String::class.java)
+                        backupDate?.let {
+                            Pair(SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).parse(backupDate), backupSnapshot)
+                        }
+                    }.sortedByDescending { it.first }
+
+                    var count = 0
+                    for ((backupDateTime, backupSnapshot) in sortedBackups) {
+                        if (backupDateTime != null) {
+                            if (backupDateTime.after(lastFillingDate)) {
+                                val temperature = backupSnapshot.child("water_temperature").getValue(Double::class.java)
+                                if (temperature != null) {
+                                    temperatures.add(temperature)
+                                    count++
+                                    if (count >= 10) {
+                                        break
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
 
-                listener(temperatures) // Callback with filtered temperatures
+                if (temperatures.size == 10)
+                    listener(temperatures) // Callback with filtered temperatures
+                else listener(emptyList())
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
@@ -68,7 +93,7 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
         })
     }
 
-    override fun getWaterLevels(listener: (List<Double>) -> Unit) {
+    /*override fun getWaterLevels(listener: (List<Double>) -> Unit) {
         val backupsRef = mDatabase.child("UsersData").child("zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2").child("cattle_waterer_1").child("backup_data")
 
         // Listener to get backups and last_filling_date
@@ -106,7 +131,53 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
                 Log.d("FirebaseDatabaseHandler", "Error en getWaterLevels")
             }
         })
+    }*/
+
+    override fun getWaterLevels(listener: (List<Double>) -> Unit) {
+        val backupsRef = mDatabase.child("UsersData").child("zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2").child("cattle_waterer_1").child("backup_data")
+
+        backupsRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val levels = mutableListOf<Double>()
+                val lastFillingDateString = dataSnapshot.child("last_filling_date").getValue(String::class.java)
+                if (lastFillingDateString != null) {
+                    val lastFillingDate = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).parse(lastFillingDateString)
+
+                    val sortedBackups = dataSnapshot.children.mapNotNull { backupSnapshot ->
+                        val backupDate = backupSnapshot.child("date").getValue(String::class.java)
+                        backupDate?.let {
+                            Pair(SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).parse(backupDate), backupSnapshot)
+                        }
+                    }.sortedByDescending { it.first }
+
+                    var count = 0
+                    for ((backupDateTime, backupSnapshot) in sortedBackups) {
+                        if (backupDateTime != null) {
+                            if (backupDateTime.after(lastFillingDate)) {
+                                val level = backupSnapshot.child("water_level").getValue(Double::class.java)
+                                if (level != null) {
+                                    levels.add(level)
+                                    count++
+                                    if (count >= 10) {
+                                        break
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (levels.size == 10)
+                    listener(levels) // Callback with filtered levels
+                else listener(emptyList())
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.d("FirebaseDatabaseHandler", "Error en getWaterLevels")
+            }
+        })
     }
+
 
     override fun getMinWaterLevel(listener: (Double) -> Unit) {
         val minWaterLevelRef = mDatabase.child("UsersData").child("zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2").child("cattle_waterer_1").child("parametros").child("min_water_level") //Ref maxWaterLevel
