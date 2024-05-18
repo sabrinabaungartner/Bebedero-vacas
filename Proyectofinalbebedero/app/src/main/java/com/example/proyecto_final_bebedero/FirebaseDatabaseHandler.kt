@@ -340,7 +340,38 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                Log.d("FirebaseDatabaseHandler", "Error in getAllWaterTemperatures function")
+                Log.d("FirebaseDatabaseHandler", "Error in getWaterTemperaturesSortedByDate function")
+                listener(emptyMap()) // Return an empty map in case of error
+            }
+        })
+    }
+
+    override fun getWaterLevelsSortedByDate(listener: (Map<String, List<Double>>) -> Unit) {
+        val backupsRef = mDatabase.child("UsersData").child("zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2").child("cattle_waterer_1").child("backup_data")
+
+        backupsRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val levelMap = mutableMapOf<String, MutableList<Double>>()
+
+                for (backupSnapshot in dataSnapshot.children) {
+                    val backupDate = backupSnapshot.child("date").getValue(String::class.java)
+                    val level = backupSnapshot.child("water_level").getValue(Double::class.java)
+
+                    if (backupDate != null && level != null) {
+                        val dateWithoutTime = backupDate.substring(0, 10) // Get date without time
+
+                        if (!levelMap.containsKey(dateWithoutTime)) {
+                            levelMap[dateWithoutTime] = mutableListOf()
+                        }
+                        levelMap[dateWithoutTime]?.add(level)
+                    }
+                }
+
+                listener(levelMap)
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.d("FirebaseDatabaseHandler", "Error in getWaterLevelsSortedByDate function")
                 listener(emptyMap()) // Return an empty map in case of error
             }
         })

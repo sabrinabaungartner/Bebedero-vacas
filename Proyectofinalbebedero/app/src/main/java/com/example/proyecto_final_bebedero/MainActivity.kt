@@ -145,6 +145,8 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_level -> {
+                    val intent = Intent(this, MyLevelHistoryActivity::class.java)
+                    startActivity(intent)
                     true
                 }
                 R.id.nav_quality -> {

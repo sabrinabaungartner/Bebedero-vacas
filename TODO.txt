@@ -4,7 +4,6 @@ generalizar bebederos:
 * recibir datos y actualizar bebedero actual
 
 Changes:
-* Android ---> graficos (para el final)
 * Arduino ---> ver posibilidad de agregar bomba de agua?
 * General ---> acomodar parametro del nivel del agua, ya que al usar uint8_t ya no toma valores tan grandes como antes
           |
@@ -12,7 +11,6 @@ Changes:
 * Arduino ---> ver la posibilidad de borrar los backups antiguos luego de un cierto tiempo
 * Android ---> si se llega al 100% en los progress bar, que se muestre el 100% y no más que eso
 * Arduino ---> si se corta internet mientras se rellena el bebedero, cómo hago para restaurar el flujo para hacer reset una vez que volvió el servicio?
-* Android ---> filtrar por ultimo rellenado, y a su vez filtrar con los ultimos 10 backups, así se obtienen datos más certeros.
 * Arduino ---> bajarle a los tiempos
 
 Listo:
@@ -34,6 +32,9 @@ Listo:
 * Arduino ---> borrar printlns y acomodar checks de wifi activo y bt
 * Arduino ---> no pedir nada ni enviar a firebase hasta que no se establezca la comunicación por bt. Ver lo que ocurre con los primeros valores, ya que las primeras 
                mediciones siempre devuelven 0, hasta que se reacomoda todo
+* Android ---> filtrar por ultimo rellenado, y a su vez filtrar con los ultimos 10 backups, así se obtienen datos más certeros.
+* Android ---> graficos: están hechos el de la temperatura y el nivel, pero no el de la calidad porque en realidad en vez de tomar por día estoy haciendo que la calidad
+		cambie cada 20 minutos
 
 NOTAS:
 * Seteo en setup() la ultima vez que se rellenó el bebedero, para iniciar esa variable. Si el bebedero está vacío, se va a indicar que el
