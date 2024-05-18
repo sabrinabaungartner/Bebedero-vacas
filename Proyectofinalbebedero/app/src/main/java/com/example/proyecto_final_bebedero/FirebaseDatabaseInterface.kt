@@ -5,6 +5,8 @@ interface FirebaseDatabaseInterface {
 
     fun getWaterTemperatures(listener: (List<Double>) -> Unit) //listener lambda function
 
+    fun getWaterTemperaturesSortedByDate(listener: (Map<String, List<Double>>) -> Unit) //listener lambda function
+
     fun getMinWaterLevel(listener: (Double) -> Unit) //listener lambda function
 
     fun getWaterLevels(listener: (List<Double>) -> Unit) //listener lambda function

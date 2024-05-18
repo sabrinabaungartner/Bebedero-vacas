@@ -1,6 +1,7 @@
 package com.example.proyecto_final_bebedero
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
@@ -138,10 +139,15 @@ class MainActivity : AppCompatActivity() {
         // Open navigation drawer elements
         navView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
-                R.id.nav_home -> {
+                R.id.nav_temperature -> {
+                    val intent = Intent(this, MyTemperatureHistoryActivity::class.java)
+                    startActivity(intent)
                     true
                 }
-                R.id.nav_settings -> {
+                R.id.nav_level -> {
+                    true
+                }
+                R.id.nav_quality -> {
                     true
                 }
                 else -> false

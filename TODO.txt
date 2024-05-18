@@ -42,3 +42,4 @@ funcionamiento.
 * En master arduino ---> se chequea al comienzo en cada loop la comunicación bt. Si no está establecida, se intenta establecer y luego se repite el loop.
 Independientemente de si está establecida o no, se chequea si se está llenando el bebedero, ya que es prioridad.
 S la comunicación está establecida, se sigue con el flujo de trabajo (se piden valores, se setea current data, se chequean días sin rellenar, se hace el backup).
+* INFORME: poner lo de prender y apagar sensor como medida para ahorrar energia

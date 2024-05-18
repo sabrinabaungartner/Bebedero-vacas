@@ -314,5 +314,36 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
             }
         })
     }
+
+    override fun getWaterTemperaturesSortedByDate(listener: (Map<String, List<Double>>) -> Unit) {
+        val backupsRef = mDatabase.child("UsersData").child("zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2").child("cattle_waterer_1").child("backup_data")
+
+        backupsRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val temperatureMap = mutableMapOf<String, MutableList<Double>>()
+
+                for (backupSnapshot in dataSnapshot.children) {
+                    val backupDate = backupSnapshot.child("date").getValue(String::class.java)
+                    val temperature = backupSnapshot.child("water_temperature").getValue(Double::class.java)
+
+                    if (backupDate != null && temperature != null) {
+                        val dateWithoutTime = backupDate.substring(0, 10) // Get date without time
+
+                        if (!temperatureMap.containsKey(dateWithoutTime)) {
+                            temperatureMap[dateWithoutTime] = mutableListOf()
+                        }
+                        temperatureMap[dateWithoutTime]?.add(temperature)
+                    }
+                }
+
+                listener(temperatureMap)
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.d("FirebaseDatabaseHandler", "Error in getAllWaterTemperatures function")
+                listener(emptyMap()) // Return an empty map in case of error
+            }
+        })
+    }
 }
 

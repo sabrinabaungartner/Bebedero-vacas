@@ -36,6 +36,10 @@ android {
     }
 }
 
+/*repositories {
+    maven("https://jitpack.io")
+}*/
+
 dependencies {
     // Import the Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:32.7.3"))
@@ -60,4 +64,6 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
     implementation("androidx.cardview:cardview:1.0.0")
+
+   implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 }

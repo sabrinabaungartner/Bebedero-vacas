@@ -38,6 +38,8 @@
 
         <activity android:name=".MainActivity" android:theme="@style/AppTheme"/>
 
+        <activity android:name=".MyTemperatureHistoryActivity" />
+
     </application>
 
 </manifest>

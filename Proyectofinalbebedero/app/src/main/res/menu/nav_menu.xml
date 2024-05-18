@@ -3,23 +3,18 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_home"
-            android:title="Configuración de parámetros"
-            tools:ignore="HardcodedText" />
-
-        <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/nav_temperature"
             android:title="Historial de la temperatura del agua"
             tools:ignore="HardcodedText" />
 
         <item
-            android:id="@+id/nav_gallery1"
+            android:id="@+id/nav_level"
             android:title="Historial del nivel de agua"
             tools:ignore="HardcodedText" />
 
         <item
-            android:id="@+id/nav_settings"
-            android:title="Historial de calidad del agua"
+            android:id="@+id/nav_quality"
+            android:title="Historial de la calidad del agua"
             tools:ignore="HardcodedText" />
     </group>
 </menu>
