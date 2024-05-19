@@ -38,14 +38,14 @@ class MainActivity : AppCompatActivity() {
 
     // Vars for water level
     private lateinit var waterLevelView: CardView
-    private lateinit var progressBarWaterLevel: ProgressBar
-    private lateinit var progressBarWaterLevelText: TextView
+    //private lateinit var progressBarWaterLevel: ProgressBar
+    //private lateinit var progressBarWaterLevelText: TextView
     private lateinit var textViewWaterLevel: TextView
 
     // Vars for water quality
     private lateinit var waterQualityView: CardView
-    private lateinit var progressBarWaterQuality: ProgressBar
-    private lateinit var progressBarWaterQualityText: TextView
+    //private lateinit var progressBarWaterQuality: ProgressBar
+    //private lateinit var progressBarWaterQualityText: TextView
     private lateinit var textViewWaterQuality: TextView
 
     // SeekBars
@@ -166,15 +166,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun initWaterLevelViews() {
         waterLevelView = findViewById(R.id.cardViewWaterLevel)
-        progressBarWaterLevel = waterLevelView.findViewById(R.id.circularProgressBar)
-        progressBarWaterLevelText = waterLevelView.findViewById(R.id.percentageTextView)
+        //progressBarWaterLevel = waterLevelView.findViewById(R.id.circularProgressBar)
+        //progressBarWaterLevelText = waterLevelView.findViewById(R.id.percentageTextView)
         textViewWaterLevel = findViewById(R.id.TextViewWaterLevel)
     }
 
     private fun initWaterQualityViews() {
         waterQualityView = findViewById(R.id.cardViewWaterQuality)
-        progressBarWaterQuality = waterQualityView.findViewById(R.id.circularProgressBar)
-        progressBarWaterQualityText = waterQualityView.findViewById(R.id.percentageTextView)
+        //progressBarWaterQuality = waterQualityView.findViewById(R.id.circularProgressBar)
+        //progressBarWaterQualityText = waterQualityView.findViewById(R.id.percentageTextView)
         textViewWaterQuality = findViewById(R.id.TextViewWaterQuality)
     }
 
@@ -218,13 +218,13 @@ class MainActivity : AppCompatActivity() {
     private fun listenForChangesOnWaterQualityValues() {
         firebaseDatabaseInterface.getWaterQuality { quality ->
             waterQuality = quality
-            userNotifiedAboutWaterQuality = false
             updateWaterQuality()
         }
 
         firebaseDatabaseInterface.getWaterMaxDaysWithoutFill { maxDays ->
             maxDaysWithoutFill = maxDays
             if (maxDaysWithoutFill != qualityLectureError) {
+                userNotifiedAboutWaterQuality = false
                 updateWaterQuality()
             }
             else {
@@ -320,9 +320,9 @@ class MainActivity : AppCompatActivity() {
                 if (progressBarPercentageWater > 100) {
                     progressBarPercentageWater = 100
                 }
-                Log.d("MainActivity", "Porcentaje water level: $progressBarPercentageWater")
-                progressBarWaterLevel.progress = progressBarPercentageWater
-                progressBarWaterLevelText.text = "${progressBarPercentageWater}%"
+                //Log.d("MainActivity", "Porcentaje water level: $progressBarPercentageWater")
+                //progressBarWaterLevel.progress = progressBarPercentageWater
+                //progressBarWaterLevelText.text = "${progressBarPercentageWater}%"
 
                 val waterLevelMessage = when {
                     progressBarPercentageWater < 50 -> "Rellenar bebedero"
@@ -344,8 +344,8 @@ class MainActivity : AppCompatActivity() {
             } else {
                 Log.d("MainActivity", "No water level data available")
                 textViewWaterLevel.text = "Recopilando datos del nivel de agua..."
-                progressBarWaterLevel.progress = 0
-                progressBarWaterLevelText.text = "NaN"
+                //progressBarWaterLevel.progress = 0
+                //progressBarWaterLevelText.text = "NaN"
             }
         }
     }
@@ -354,10 +354,10 @@ class MainActivity : AppCompatActivity() {
     private fun updateWaterQuality() {
         if (waterQuality != 99) {
             // Calculate percentage and update progressBar
-            val progressBarWaterQualityValue = ((waterQuality * 100) / maxDaysWithoutFill)
-            Log.d("MainActivity", "Porcentaje water quality: $progressBarWaterQualityValue")
-            progressBarWaterQuality.progress = progressBarWaterQualityValue
-            progressBarWaterQualityText.text = "${progressBarWaterQualityValue}%"
+            //val progressBarWaterQualityValue = ((waterQuality * 100) / maxDaysWithoutFill)
+            //Log.d("MainActivity", "Porcentaje water quality: $progressBarWaterQualityValue")
+            //progressBarWaterQuality.progress = progressBarWaterQualityValue
+            //progressBarWaterQualityText.text = "${progressBarWaterQualityValue}%"
 
             val waterQualityMessage: String = when {
                 waterQuality < medDaysWithoutFill  -> "Calidad del agua: excelente"
@@ -378,8 +378,8 @@ class MainActivity : AppCompatActivity() {
         else {
             Log.d("MainActivity", "No water level data available")
             textViewWaterQuality.text = "Recopilando datos de la calidad del agua..."
-            progressBarWaterQuality.progress = 0
-            progressBarWaterQualityText.text = "NaN"
+            //progressBarWaterQuality.progress = 0
+            //progressBarWaterQualityText.text = "NaN"
         }
     }
 
@@ -399,7 +399,7 @@ class MainActivity : AppCompatActivity() {
     private fun showErrorWaterQualityData() {
         Log.d("MainActivity", "No water med quality data available")
         textViewWaterQuality.text = "Recopilando datos de la calidad del agua..."
-        progressBarWaterQuality.progress = 0
-        progressBarWaterQualityText.text = "NaN"
+        //progressBarWaterQuality.progress = 0
+        //progressBarWaterQualityText.text = "NaN"
     }
 }

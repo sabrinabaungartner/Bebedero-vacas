@@ -58,7 +58,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="120dp"
                 android:textColor="@color/white"
-                android:textSize="20sp"
+                android:textSize="18sp"
                 android:textStyle="bold" />
         </androidx.cardview.widget.CardView>
 
@@ -77,24 +77,25 @@
             app:layout_constraintBottom_toTopOf="@id/cardViewWaterQuality">
 
             <!-- Include circle style and ProgressBar style for water level -->
+            <!-- android:background="@drawable/circular_background" -->
             <RelativeLayout
                 android:id="@+id/circularBackgroundWaterLevel"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:layout_marginTop="12dp"
                 android:layout_marginEnd="15dp"
-                android:background="@drawable/circular_background"
+                android:background="@drawable/water_level"
                 android:elevation="20dp"
                 android:layout_gravity="end"
                 android:gravity="center">
 
-                <include
+                <!-- <include
                     layout="@layout/progress_bar_layout"
                     android:id="@+id/waterLevelProgressBarLayout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent" /> -->
             </RelativeLayout>
 
             <!-- TextView to show water level status -->
@@ -106,7 +107,7 @@
                 android:gravity="center"
                 android:layout_marginStart="10dp"
                 android:textColor="@color/white"
-                android:textSize="20sp"
+                android:textSize="18sp"
                 android:textStyle="bold" />
         </androidx.cardview.widget.CardView>
 
@@ -125,24 +126,25 @@
             app:layout_constraintBottom_toBottomOf="@id/seekBarLinearLayoutWaterTemperature">
 
             <!-- Include circle style and ProgressBar style for water quality -->
+            <!-- android:background="@drawable/circular_background" -->
             <RelativeLayout
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:layout_marginTop="12dp"
                 android:layout_marginEnd="15dp"
-                android:background="@drawable/circular_background"
+                android:background="@drawable/potable_water"
                 android:elevation="20dp"
                 android:layout_gravity="end"
                 android:gravity="center">
 
                 <!-- ProgressBar circular water quality -->
-                <include
+               <!-- <include
                     layout="@layout/progress_bar_layout"
                     android:id="@+id/waterQualityProgressBarLayout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent" /> -->
             </RelativeLayout>
 
             <!-- TextView to show water level status -->
@@ -154,7 +156,7 @@
                 android:gravity="center"
                 android:layout_marginStart="10dp"
                 android:textColor="@color/white"
-                android:textSize="20sp"
+                android:textSize="18sp"
                 android:textStyle="bold" />
 
         </androidx.cardview.widget.CardView>
