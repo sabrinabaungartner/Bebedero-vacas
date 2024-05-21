@@ -9,7 +9,7 @@ Changes:
 * Android ---> si se llega al 100% en los progress bar, que se muestre el 100% y no más que eso
 * Arduino ---> si se corta internet mientras se rellena el bebedero, cómo hago para restaurar el flujo para hacer reset una vez que volvió el servicio?
 * Arduino ---> bajarle a los tiempos
-* Android ---> acomodar lógica del nivel del agua que está al revés ajaja
+* Android ---> acomodar lógica del nivel del agua que está al revés ajaja --> creo que vi mal, pero revisar por las dudas
 * Arduino ---> al conectar el nivel de agua con el resto de los componentes, el valor que sensa varía a cuando lo dejo solito. No entiendo
 ese comportamiento
 

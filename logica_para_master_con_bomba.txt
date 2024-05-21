@@ -1,0 +1,22 @@
+si pasaron 1 segundos
+	Hay conexion bt?
+		no -->
+			segundos == 0
+			conectar al esclavo
+si pasaron 2 segundos
+	hay que rellenar bebedero?
+		si -->
+			mandar a slave llenar bebedero
+			bebedero llenandose true
+Si pasaron 3 segundos y se esta llenando el bebedero
+	requerir al slave estado del relleno del bebedero
+	recibir si se esta llenando el bebedero y actualizar variable
+Si pasaron 4 segundos y no se esta llenando el bebedero
+	request_and_receive_water_level_and_temperature();
+Si pasaron 5 segundos y no se esta llenando el bebedero
+	update_status_cattle_waterer();
+Si pasaron 6 segundos
+	Si no se esta llenando el bebedero
+		backup_current_data(cattle_waterer_selected);
+        seconds = 0;
+		
