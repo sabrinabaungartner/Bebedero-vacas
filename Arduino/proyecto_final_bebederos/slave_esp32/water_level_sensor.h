@@ -5,7 +5,7 @@
 #define WATER_LEVEL_SENSOR_H
 
 #define POWER 19 //33
-#define PIN_SIGNAL 15 //32
+#define PIN_SIGNAL 33 //32
 
 void set_water_level_parameters();
 

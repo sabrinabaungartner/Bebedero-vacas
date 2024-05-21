@@ -38,6 +38,9 @@ void assemble_package(uint8_t size, uint8_t reply, int water_level, float water_
     my_packet_to_send.payload[i] = (water_level >> (i * 8)) & 0xFF;
   }
 
+  Serial.print("nivel agua en clase bt: ");
+  Serial.println(water_level);
+
   int water_temperature_aux = int(water_temperature);
   float decimal = water_temperature - water_temperature_aux;
 
