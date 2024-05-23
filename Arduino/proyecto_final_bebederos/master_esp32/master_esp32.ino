@@ -47,43 +47,39 @@ void update_status_cattle_waterer() {
 }
 
 void funcion_timer() {
-  if (get_fill_waterer(cattle_waterer_selected) == 1) { // Check if it is necessary to fill waterer
-    if (filling_waterer == 0) {
-      set_is_water_pump_enabled(1, cattle_waterer_selected); // Enable water pump
-      filling_waterer = 1;
-      seconds = 0;
-    }
-    if ((filling_waterer == 1) && (seconds == 5)) {
-      reset_values_after_filling_waterer(); // At this time have passed 5 seconds
-      filling_waterer = 0;
-      seconds = 0;
-    }
-  }
-
-  else {
-    if (!check_slave_is_connected()) {
+  if (!check_slave_is_connected()) {
     Serial.println("Serial BT communicaton is not seted!");
     connect_to_slave();
     seconds = 0;
+  }
+
+  else {
+    if (seconds == 2) {
+      if (get_fill_waterer(cattle_waterer_selected) == 1) { // Check if it is necessary to fill waterer
+        if (filling_waterer == 0) {
+          set_is_water_pump_enabled(1, cattle_waterer_selected); // Enable water pump
+          filling_waterer = 1;
+          seconds = 0;
+        }
+        if ((filling_waterer == 1) && (seconds == 5)) {
+          reset_values_after_filling_waterer(); // At this time have passed 5 seconds
+          filling_waterer = 0;
+          seconds = 0;
+        }
+      }
     }
-    
-    else {
-      /*if (seconds == 2) {
-        cattle_waterer_selected = get_cattle_waterer_selected();
-      }*/
 
-      if (seconds == 10) {
-        request_and_receive_water_level_and_temperature();
-      }
+    if (seconds == 4) {
+      request_and_receive_water_level_and_temperature();
+    }
 
-      if (seconds == 15) {
-        update_status_cattle_waterer();
-      }
+    if (seconds == 6) {
+      update_status_cattle_waterer();
+    }
 
-      if (seconds == 20) {
-        backup_current_data(cattle_waterer_selected);
-        seconds = 0;
-      }
+    if (seconds == 8) {
+      backup_current_data(cattle_waterer_selected);
+      seconds = 0;
     }
   }
 
