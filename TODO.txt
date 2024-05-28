@@ -4,11 +4,9 @@ generalizar bebederos:
 * recibir datos y actualizar bebedero actual
 
 Changes:
-* Arduino ---> ver posibilidad de agregar bomba de agua?
 * Arduino ---> ver la posibilidad de borrar los backups antiguos luego de un cierto tiempo
 * Android ---> si se llega al 100% en los progress bar, que se muestre el 100% y no más que eso
 * Arduino ---> si se corta internet mientras se rellena el bebedero, cómo hago para restaurar el flujo para hacer reset una vez que volvió el servicio?
-* Arduino ---> bajarle a los tiempos
 * Android ---> acomodar lógica del nivel del agua que está al revés ajaja --> creo que vi mal, pero revisar por las dudas
 * Arduino ---> al conectar el nivel de agua con el resto de los componentes, el valor que sensa varía a cuando lo dejo solito. No entiendo
 ese comportamiento
@@ -38,6 +36,8 @@ Listo:
 * General ---> acomodar parametro del nivel del agua, ya que al usar uint8_t ya no toma valores tan grandes como antes
           |
           ---> le puse 500 como máximo, ya que al rellenar el bebedero varía entre 400 y 600 aprox
+* Arduino ---> bajarle a los tiempos
+* Arduino ---> ver posibilidad de agregar bomba de agua?
 
 NOTAS:
 * Seteo en setup() la ultima vez que se rellenó el bebedero, para iniciar esa variable. Si el bebedero está vacío, se va a indicar que el
@@ -48,4 +48,4 @@ Independientemente de si está establecida o no, se chequea si se está llenando
 S la comunicación está establecida, se sigue con el flujo de trabajo (se piden valores, se setea current data, se chequean días sin rellenar, se hace el backup).
 * INFORME: poner lo de prender y apagar sensor como medida para ahorrar energia --> el prender y apagarlo provoca lecturas incorrectas, por lo que es mejor dejarlo
 encendido
-* Arduino ---> puse como llenado máximo 500
+* Arduino ---> puse como llenado máximo 300
