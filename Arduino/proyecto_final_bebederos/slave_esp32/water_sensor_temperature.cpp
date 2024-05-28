@@ -5,12 +5,12 @@ DallasTemperature DS18B20(&oneWire);
 
 float temp_c; // Temperature in Celsius
 
-void set_water_temperature() {
-  DS18B20.begin();    // initialize the DS18B20 sensor
+void setup_water_temperature_sensor() {
+  DS18B20.begin();
 }
 
-float read_water_temperature() {
-  DS18B20.requestTemperatures();       // Send the command to get temperatures
-  temp_c = DS18B20.getTempCByIndex(0);  // Read temperature in °C
+float get_water_temperature() {
+  DS18B20.requestTemperatures();
+  temp_c = DS18B20.getTempCByIndex(0);
   return temp_c;
 }

@@ -8,7 +8,10 @@
 
 #define SENSOR_PIN 5
 
-void set_water_temperature();
-float read_water_temperature();
+/** initialize the DS18B20 sensor */
+void setup_water_temperature_sensor();
+
+/** Get temperature of water in ºC. Returns 0 in case of error */
+float get_water_temperature();
 
 #endif

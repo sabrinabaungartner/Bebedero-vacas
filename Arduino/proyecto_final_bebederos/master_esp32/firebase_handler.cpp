@@ -343,3 +343,15 @@ void set_days_without_filling(int value, int cattle_waterer_selected) {
     } else { Serial.println("in function set_days_without_filling: failed to set data in firebase function"); }
   } else { Serial.println("in function set_days_without_filling: Firebase not ready"); }
 }
+
+int get_max_water_level(int cattle_waterer_selected) {
+  if (Firebase.ready()) {
+    if (Firebase.RTDB.getInt(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/parametros/max_water_level")) {
+      if (fbdo.dataType() == "int") {
+        Serial.println("Success on getting value of max_water_level");
+        return fbdo.intData();
+      } else { Serial.println("in function get_max_water_level: failed to get data type from firebase function"); }
+    } else { Serial.println("in function get_max_water_level: failed to get data from firebase function"); }
+  } else { Serial.println("in function get_max_water_level: Firebase not ready"); }
+  return 0;
+}

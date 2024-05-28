@@ -3,7 +3,7 @@
 const int pinRelay = 21;
 
 // Tiempo de funcionamiento de la bomba en milisegundos (ejemplo: 10 segundos)
-const unsigned long tiempoFuncionamientoBomba = 10000; // 10 segundos en milisegundos
+const unsigned long tiempoFuncionamientoBomba = 2000; // 2 segundos en milisegundos
 
 void encenderBomba() {
   // Activar el relé (dependiendo del tipo de relé)
@@ -30,7 +30,9 @@ void funcion_prender_apagar_bomba() {
 void setup() {
   // Configurar el pin del relé como salida
   pinMode(pinRelay, OUTPUT);
-  funcion_prender_apagar_bomba();
+  digitalWrite(pinRelay, LOW);
+  //delay(4000);
+  //funcion_prender_apagar_bomba();
   //delay(1000);
 }
 

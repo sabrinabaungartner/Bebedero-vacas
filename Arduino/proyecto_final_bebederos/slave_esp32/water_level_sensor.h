@@ -7,8 +7,10 @@
 #define POWER 19 //33
 #define PIN_SIGNAL 33 //32
 
-void set_water_level_parameters();
+/** Set pins as output or input modes. Set power in HIGH mode */
+void setup_water_level_sensor();
 
-int read_water_level();
+/** Get level of water. Returns 0 in case of read failure */
+int get_water_level();
 
 #endif

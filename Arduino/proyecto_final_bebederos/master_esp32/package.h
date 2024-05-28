@@ -2,15 +2,17 @@
 #define END_PACKET '>'
 #define ESCAPE '\'
 
-#define GET_WATER_LEVEL 1
-#define GET_WATER_TEMPERATURE 2
-#define GET_ALL 3
-#define REPLY_ALL 4
-#define REPLY_WATER_LEVEL 5
-#define REPLY_WATER_TEMPERATURE 6
+#define GET_WATER_LEVEL_AND_TEMPERATURE 1
+#define REPLY_WATER_LEVEL_AND_TEMPERATURE 2
+#define TURN_ON_PUMP 3
+#define TURN_OFF_PUMP 4
+#define REPLY_TURN_ON_PUMP 5
+#define REPLY_TURN_OFF_PUMP 6
+#define GET_WATER_LEVEL 7
+#define REPLY_WATER_LEVEL 8
 
-#define MAX_PAYLOAD_SIZE 6 // 4 bytes for water_level (int value) and 2 bytes for water_temperature (integer and decimal part)
-#define SIZE_ARRAY 10 // 1 byte for integer water_level + 1 byte for START_PACKET + 1 byte for END_PACKET + 1 byte of type message (GET/REPLY) + 6 bytes for MAX_PAYLOAD_SIZE
+#define MAX_PAYLOAD_SIZE 7 // 4 bytes for water_level (int value), 2 bytes for water_temperature (integer and decimal part) and 1 byte for success or failure in pump actions
+#define SIZE_ARRAY 11 // 1 byte for lenght + 1 byte for START_PACKET + 1 byte for END_PACKET + 1 byte of type message (GET/REPLY/FILL_WATERER) + 7 bytes for MAX_PAYLOAD_SIZE
 #define NULO 0
 
 struct packet {

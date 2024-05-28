@@ -26,11 +26,15 @@ extern BluetoothSerial SerialBT;
 void callback(esp_spp_cb_event_t event, esp_spp_cb_param_t *param);
 
 /** Set initial parameters and configuration for the bluetooth connection */
-void set_bluetooth_configuration();
+void setup_bluetooth_configuration();
 
 /** Checks if data was received and stores it for later processing */
 uint8_t bluetooth_SPP_RxHandler();
 
 /** Sends a response to the request */
 void bluetooth_SPP_TxHandler(int water_level, float water_temperature);
+
+/** Return type of message requested */
+uint8_t get_message_type_of_request();
+
 #endif

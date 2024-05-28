@@ -2,6 +2,9 @@
 #include "Arduino.h"
 #include "package.h"
 
+#define SUCCESS 1
+#define FAILURE 0
+
 String device_name = "ESP32-BT-Slave";
 
 BluetoothSerial SerialBT;
@@ -23,14 +26,30 @@ uint8_t array_to_send[SIZE_ARRAY];
 struct packet my_received_packet_struct;
 struct packet my_packet_to_send;
 
-void set_bluetooth_configuration() {
+void setup_bluetooth_configuration() {
   SerialBT.register_callback(callback);
   SerialBT.begin(device_name);
   pinMode(LED_BT_BLUE, OUTPUT);
   digitalWrite(LED_BT_BLUE, LOW);
 }
 
-void assemble_package(uint8_t size, uint8_t reply, int water_level, float water_temperature) {
+void assemble_package_water_level(uint8_t size, uint8_t reply, int water_level, float water_temperature, uint8_t pump_status) {
+  my_packet_to_send.length = size;
+  my_packet_to_send.type_of_message = reply;
+
+  for (size_t i = 0; i < sizeof(int); i++) { // i goes from 0 to 4
+    my_packet_to_send.payload[i] = (water_level >> (i * 8)) & 0xFF;
+  }
+
+  Serial.print("nivel agua en clase bt: ");
+  Serial.println(water_level);
+
+  my_packet_to_send.payload[4] = water_temperature;
+  my_packet_to_send.payload[5] = water_temperature;
+  my_packet_to_send.payload[6] = pump_status;
+}
+
+void assemble_package_water_level_temperature(uint8_t size, uint8_t reply, int water_level, float water_temperature, uint8_t pump_status) {
   my_packet_to_send.length = size;
   my_packet_to_send.type_of_message = reply;
 
@@ -49,6 +68,20 @@ void assemble_package(uint8_t size, uint8_t reply, int water_level, float water_
 
   my_packet_to_send.payload[4] = water_temperature_aux_uint8;
   my_packet_to_send.payload[5] = decimal_uint8;
+  my_packet_to_send.payload[6] = pump_status;
+}
+
+void assemble_package_pump(uint8_t size, uint8_t reply, int water_level, float water_temperature, uint8_t pump_status) {
+  my_packet_to_send.length = size;
+  my_packet_to_send.type_of_message = reply;
+
+  for (size_t i = 0; i < sizeof(int); i++) { // i goes from 0 to 4
+    my_packet_to_send.payload[i] = water_level;
+  }
+
+  my_packet_to_send.payload[4] = water_temperature;
+  my_packet_to_send.payload[5] = water_temperature;
+  my_packet_to_send.payload[6] = pump_status;
 }
 
 void send_package() {
@@ -57,16 +90,31 @@ void send_package() {
 }
 
 void bluetooth_SPP_TxHandler(int water_level, float water_temperature) {
-  if (my_received_packet_struct.type_of_message == GET_ALL) {
-    assemble_package(SIZE_ARRAY, REPLY_ALL, water_level, water_temperature);
-    send_package();
+  switch(my_received_packet_struct.type_of_message) {
+    case GET_WATER_LEVEL_AND_TEMPERATURE:
+      Serial.println("estoy por ensamblar nivel y temperatura");
+      assemble_package_water_level_temperature(SIZE_ARRAY, REPLY_WATER_LEVEL_AND_TEMPERATURE, water_level, water_temperature, NULO);
+      send_package();
+      break;
+    case GET_WATER_LEVEL:
+      assemble_package_water_level(SIZE_ARRAY, REPLY_WATER_LEVEL, water_level, NULO, NULO);
+      send_package();
+      break;
+    case TURN_ON_PUMP:
+      assemble_package_pump(SIZE_ARRAY, REPLY_TURN_ON_PUMP, NULO, NULO, SUCCESS);
+      send_package();
+      break;
+    case TURN_OFF_PUMP:
+      assemble_package_pump(SIZE_ARRAY, REPLY_TURN_OFF_PUMP, NULO, NULO, SUCCESS);
+      send_package();
+      break;
   }
 }
 
 uint8_t bluetooth_SPP_RxHandler() {
   uint8_t index = 0;
   if (SerialBT.available() > 0) {
-    while (SerialBT.available() && (index < 10)) {
+    while (SerialBT.available() && (index < SIZE_ARRAY)) {
       received_array[index++] = SerialBT.read();
     }
 
@@ -77,4 +125,9 @@ uint8_t bluetooth_SPP_RxHandler() {
   else {
     return 0;
   }
+}
+
+uint8_t get_message_type_of_request() {
+  Serial.println(my_received_packet_struct.type_of_message);
+  return my_received_packet_struct.type_of_message;
 }

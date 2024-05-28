@@ -46,7 +46,7 @@ void callback(esp_spp_cb_event_t event, esp_spp_cb_param_t *param){
   }
 }
 
-void set_bluetooth_configuration() {
+void setup_bluetooth_configuration() {
   pinMode(LED_BT_BLUE, OUTPUT);
 
   SerialBT.register_callback(callback);
@@ -90,19 +90,37 @@ void create_package_to_send(uint8_t size, uint8_t message, uint8_t value) {
   pac_to_send.payload[3] = value;
   pac_to_send.payload[4] = value;
   pac_to_send.payload[5] = value;
+  pac_to_send.payload[6] = value;
 }
 
 bool check_slave_is_connected() {
   return slave_is_connected;
 }
 
-void request_water_level_temperature() {
+void request_to_slave(uint8_t request) {
   if (!slave_is_connected) {
     connect_to_slave();
   }
   else {
-    create_package_to_send(SIZE_ARRAY, GET_ALL, NULO);
-    send_package();
+    switch(request) {
+      case GET_WATER_LEVEL_AND_TEMPERATURE:
+      Serial.println("requiero water level and temperature");
+        create_package_to_send(SIZE_ARRAY, GET_WATER_LEVEL_AND_TEMPERATURE, NULO);
+        send_package();
+        break;
+      case GET_WATER_LEVEL:
+        create_package_to_send(SIZE_ARRAY, GET_WATER_LEVEL, NULO);
+        send_package();
+        break;
+      case TURN_ON_PUMP:
+        create_package_to_send(SIZE_ARRAY, TURN_ON_PUMP, NULO);
+        send_package();
+        break;
+      case TURN_OFF_PUMP:
+        create_package_to_send(SIZE_ARRAY, TURN_OFF_PUMP, NULO);
+        send_package();
+        break;
+    }
   }
 }
 
@@ -126,13 +144,17 @@ float receive_requested_water_temperature() {
   return float_number;
 }
 
-void receive_water_level_temperature() {
+void receive_from_slave() {
   uint8_t index = 0;
-  while (SerialBT.available()) {
+  while (SerialBT.available() && (index < SIZE_ARRAY)) {
     received_array[index++] = SerialBT.read();
   }
 
   received_packet(&my_received_packet_struct, received_array);
+}
+
+uint8_t get_message_received() {
+  return my_received_packet_struct.type_of_message;
 }
 
 
