@@ -13,6 +13,7 @@
 #define GET_WATER_LEVEL 7
 #define REPLY_WATER_LEVEL 8
 #define NULO 0
+#define MAX_SECONDS_PUMP_ON 60
 
 // Variables
 int seconds = 0;
@@ -26,6 +27,7 @@ bool wifi_is_connected = false;
 int max_water_level = 0;
 int turn_off_water_pump = 0;
 int fill_waterer = 0;
+int seconds_pump_on = 0;
 
 // Declaration of functions
 void iniciar_timer();
@@ -57,6 +59,7 @@ void reset_values_after_filling_waterer() {
   set_fill_waterer(0, cattle_waterer_selected);
   set_last_filling_date(cattle_waterer_selected);
   set_days_without_filling(0, cattle_waterer_selected);
+  reset_last_check_filling_date(cattle_waterer_selected);
 }
 
 void update_status_cattle_waterer() {
@@ -82,6 +85,7 @@ void funcion_timer() {
           if (get_message_received() == REPLY_TURN_ON_PUMP) {
             set_is_water_pump_enabled(1, cattle_waterer_selected); // Enable water pump in Firebase
             filling_waterer = 1;
+            seconds_pump_on = 0;
             Serial.println("requeri prender la bomba al slave y el slave me respondio que la prendio");
           }
       }
@@ -92,9 +96,11 @@ void funcion_timer() {
         request_to_slave(GET_WATER_LEVEL);
         receive_from_slave();
         Serial.println("pedi y recibi nivel del agua");
-        if (receive_requested_water_level() >= max_water_level) {
+        if ((receive_requested_water_level() >= max_water_level) || (seconds_pump_on >= MAX_SECONDS_PUMP_ON)) {
           turn_off_water_pump = 1;
           Serial.println("la bomab se tiene que apagar!");
+          Serial.print("seconds_pump_on: ");
+          Serial.println(seconds_pump_on);
         }
       }
     }
@@ -114,6 +120,7 @@ void funcion_timer() {
               filling_waterer = 0;
               turn_off_water_pump = 0;
               fill_waterer = 0;
+              seconds_pump_on = 0;
             }
           }
         }
@@ -133,6 +140,10 @@ void funcion_timer() {
       backup_current_data(cattle_waterer_selected);
       seconds = 0;
     }
+
+    if (filling_waterer == 1) { // Incrementar el contador de tiempo solo si la bomba está encendida
+      seconds_pump_on += 1;
+    }
   }
 
   seconds += 1;
@@ -151,7 +162,7 @@ void setup() {
   fnqueue_init();
   iniciar_timer();
   set_last_filling_date(cattle_waterer_selected);
-  //set last_check_filling date en cero
+  reset_last_check_filling_date(cattle_waterer_selected);
   max_water_level = get_max_water_level(cattle_waterer_selected);
   Serial.print("max water level: ");
   Serial.println(max_water_level);

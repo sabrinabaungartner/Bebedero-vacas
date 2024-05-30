@@ -39,6 +39,9 @@ void set_is_water_pump_enabled(int value, int cattle_waterer_selected);
 /** Set to Firebase database the last filling date */
 void set_last_filling_date(int cattle_waterer_selected);
 
+/** Set to Firebase database the last filling date */
+void reset_last_check_filling_date(int cattle_waterer_selected);
+
 /** Get from Firebase database the date of the last backup */
 String get_last_backup_date(int cattle_waterer_selected);
 

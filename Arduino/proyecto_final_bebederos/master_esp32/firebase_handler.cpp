@@ -287,9 +287,9 @@ void update_days_without_filling(int cattle_waterer_selected) {
           lastCheckTime.tm_sec = checkSecond;
 
           // Check if 20 minutes have passed since last_filling_date
-          if (difftime(mktime(&timeinfo), mktime(&lastFilledTime)) >= 1200) { // 20 minutes in seconds (20 * 60 = 1200)
-            // If last_check_filling_date is not set (== 0) or 20 minutes have passed since last check
-            if (lastCheckTime.tm_year == 0 || difftime(mktime(&timeinfo), mktime(&lastCheckTime)) >= 1200) {
+          if (difftime(mktime(&timeinfo), mktime(&lastFilledTime)) >= 300) { // 5 minutes in seconds (5 * 60 = 300)
+            // If last_check_filling_date is not set (== 0) or 5 minutes have passed since last check
+            if (lastCheckTime.tm_year == 0 || difftime(mktime(&timeinfo), mktime(&lastCheckTime)) >= 300) {
               // Update days_without_filling in Firebase
               update_days_without_filling_in_firebase(cattle_waterer_selected);
 
@@ -354,4 +354,10 @@ int get_max_water_level(int cattle_waterer_selected) {
     } else { Serial.println("in function get_max_water_level: failed to get data from firebase function"); }
   } else { Serial.println("in function get_max_water_level: Firebase not ready"); }
   return 0;
+}
+
+void reset_last_check_filling_date(int cattle_waterer_selected) {
+  if (Firebase.RTDB.setString(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/backup_data/last_check_filling_date", String(0))) {
+      Serial.println("in function reset_last_check_filling_date: updated last_check_filling_date in Firebase to 0");
+  } else { Serial.println("in function reset_last_check_filling_date: failed to set data last_check_filling_date in Firebase function to 0"); }
 }
