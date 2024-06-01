@@ -39,6 +39,8 @@ abstract class BaseHistoryActivity : AppCompatActivity() {
         lineChart.description.isEnabled = true
         lineChart.description.text = getChartDescription()
         lineChart.legend.isEnabled = true
+        lineChart.xAxis.setAvoidFirstLastClipping(true)
+        lineChart.xAxis.spaceMax = 0.5f
 
         val yAxis = lineChart.axisLeft
         yAxis.setDrawGridLines(true)
