@@ -39,25 +39,6 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
                 if (lastFillingDateString != null) {
                     val lastFillingDate = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).parse(lastFillingDateString)
 
-                    // Iterate over backups
-                    /*for (backupSnapshot in dataSnapshot.children) {
-                        val backupDate = backupSnapshot.child("date").getValue(String::class.java)
-                        if (backupDate != null) {
-
-                            val backupDateTime = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).parse(backupDate)
-
-                            // Compare two dates
-                            if (backupDateTime != null && backupDateTime.after(lastFillingDate)) {
-
-                                val temperature = backupSnapshot.child("water_temperature").getValue(Double::class.java)
-                                Log.d("dates", "lasFillingDate $lastFillingDate and backupDateTime $backupDateTime")
-                                if (temperature != null) {
-                                    temperatures.add(temperature)
-                                }
-                            }
-                        }
-                    }*/
-
                     val sortedBackups = dataSnapshot.children.mapNotNull { backupSnapshot ->
                         val backupDate = backupSnapshot.child("date").getValue(String::class.java)
                         backupDate?.let {
@@ -92,46 +73,6 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
             }
         })
     }
-
-    /*override fun getWaterLevels(listener: (List<Double>) -> Unit) {
-        val backupsRef = mDatabase.child("UsersData").child("zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2").child("cattle_waterer_1").child("backup_data")
-
-        // Listener to get backups and last_filling_date
-        backupsRef.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val levels = mutableListOf<Double>()
-                val lastFillingDateString = dataSnapshot.child("last_filling_date").getValue(String::class.java)
-                if (lastFillingDateString != null) {
-                    val lastFillingDate = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).parse(lastFillingDateString)
-
-                    // Iterate over backups
-                    for (backupSnapshot in dataSnapshot.children) {
-                        val backupDate = backupSnapshot.child("date").getValue(String::class.java)
-                        if (backupDate != null) {
-
-                            val backupDateTime = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).parse(backupDate)
-
-                            // Compare two dates
-                            if (backupDateTime != null && backupDateTime.after(lastFillingDate)) {
-
-                                val level = backupSnapshot.child("water_level").getValue(Double::class.java)
-                                Log.d("dates", "lasFillingDate $lastFillingDate and backupDateTime $backupDateTime")
-                                if (level != null) {
-                                    levels.add(level)
-                                }
-                            }
-                        }
-                    }
-                }
-
-                listener(levels) // Callback with filtered temperatures
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                Log.d("FirebaseDatabaseHandler", "Error en getWaterLevels")
-            }
-        })
-    }*/
 
     override fun getWaterLevels(listener: (List<Double>) -> Unit) {
         val backupsRef = mDatabase.child("UsersData").child("zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2").child("cattle_waterer_1").child("backup_data")
@@ -179,13 +120,13 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
     }
 
 
-    override fun getMinWaterLevel(listener: (Double) -> Unit) {
+    override fun getMinWaterLevel(listener: (Int) -> Unit) {
         val minWaterLevelRef = mDatabase.child("UsersData").child("zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2").child("cattle_waterer_1").child("parametros").child("min_water_level") //Ref maxWaterLevel
 
         // listener max water level
         minWaterLevelRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val minWaterLevel = dataSnapshot.getValue(Double::class.java) ?: 0.0 // get min water level
+                val minWaterLevel = dataSnapshot.getValue(Int::class.java) ?: 0 // get min water level
                 listener(minWaterLevel) // call callback with value obtained
             }
 

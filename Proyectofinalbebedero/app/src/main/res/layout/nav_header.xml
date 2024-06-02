@@ -17,5 +17,3 @@
         android:textColor="#FFFFFF"
         tools:ignore="HardcodedText" />
 </LinearLayout>
-
-<!-- android:src="@drawable/ic_profile" -->

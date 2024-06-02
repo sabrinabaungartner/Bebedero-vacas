@@ -9,7 +9,7 @@ interface FirebaseDatabaseInterface {
 
     fun getWaterLevelsSortedByDate(listener: (Map<String, List<Double>>) -> Unit) //listener lambda function
 
-    fun getMinWaterLevel(listener: (Double) -> Unit) //listener lambda function
+    fun getMinWaterLevel(listener: (Int) -> Unit) //listener lambda function
 
     fun getWaterLevels(listener: (List<Double>) -> Unit) //listener lambda function
 

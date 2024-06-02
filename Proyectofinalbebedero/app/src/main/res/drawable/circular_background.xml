@@ -1,11 +1,11 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Círculo exterior (fondo) -->
+    <!-- Outer circle (background) -->
     <item>
         <shape android:shape="oval">
             <solid android:color="@android:color/transparent" />
         </shape>
     </item>
-    <!-- Círculo interior (borde) -->
+    <!-- Inner circle (border) -->
     <item>
         <shape android:shape="oval">
             <solid android:color="@android:color/transparent" />

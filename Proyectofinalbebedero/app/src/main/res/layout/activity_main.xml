@@ -268,8 +268,10 @@
                 android:layout_height="wrap_content"
                 android:max="5"
                 android:progress="0"
+                android:min="1"
                 android:progressTint="@color/violet"
-                android:thumbTint="@color/violet"/>
+                android:thumbTint="@color/violet"
+                tools:ignore="UnusedAttribute" />
         </LinearLayout>
 
         <!-- Top bar with text -->

@@ -5,11 +5,7 @@ generalizar bebederos:
 
 Changes:
 * Arduino ---> ver la posibilidad de borrar los backups antiguos luego de un cierto tiempo
-* Android ---> si se llega al 100% en los progress bar, que se muestre el 100% y no más que eso
 * Arduino ---> si se corta internet mientras se rellena el bebedero, cómo hago para restaurar el flujo para hacer reset una vez que volvió el servicio?
-* Android ---> acomodar lógica del nivel del agua que está al revés ajaja --> creo que vi mal, pero revisar por las dudas
-* Arduino ---> al conectar el nivel de agua con el resto de los componentes, el valor que sensa varía a cuando lo dejo solito. No entiendo
-ese comportamiento
 
 Listo:
 * Android ---> deshabilitar notificaciones push mientras se esta llenando el bebedero (o esperar 40 segundos para las dos primeras mediciones)
@@ -38,6 +34,8 @@ Listo:
           ---> le puse 500 como máximo, ya que al rellenar el bebedero varía entre 400 y 600 aprox
 * Arduino ---> bajarle a los tiempos
 * Arduino ---> ver posibilidad de agregar bomba de agua?
+* Android ---> acomodar lógica del nivel del agua que está al revés ajaja --> creo que vi mal, pero revisar por las dudas
+* Android ---> si se llega al 100% en los progress bar, que se muestre el 100% y no más que eso
 
 NOTAS:
 * Seteo en setup() la ultima vez que se rellenó el bebedero, para iniciar esa variable. Si el bebedero está vacío, se va a indicar que el
