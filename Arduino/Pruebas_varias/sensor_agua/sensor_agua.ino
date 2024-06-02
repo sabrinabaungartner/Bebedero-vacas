@@ -1,5 +1,5 @@
 #define POWER 19
-#define SIGNAL 15
+#define SIGNAL 33
 
 int value = 0;
 int level = 0;
@@ -7,7 +7,8 @@ int level = 0;
 void setup() {
   Serial.begin(115200);
   pinMode(POWER, OUTPUT);
-  digitalWrite(POWER, LOW);
+  pinMode(SIGNAL, INPUT);
+  digitalWrite(POWER, HIGH); // Encender el sensor
 }
 
 void loop() {
@@ -19,9 +20,6 @@ void loop() {
 }
 
 uint8_t* waterSensor() {
-  digitalWrite(POWER, HIGH); // Encender el sensor
-  delay(10); // Esperar estabilización
-
   value = analogRead(SIGNAL); // Leer valor analógico del pin SIGNAL (GPIO15)
   Serial.print("value antes de convertir: ");
   Serial.println(value);
@@ -31,9 +29,6 @@ uint8_t* waterSensor() {
   for (size_t i = 0; i < sizeof(int); i++) {
     bytes_to_send[i] = (value >> (i * 8)) & 0xFF; // Obtener el byte i-ésimo del valor int
   }
-
-  delay(10); // Breve retardo antes de apagar el sensor
-  digitalWrite(POWER, LOW); // Apagar el sensor
 
   return bytes_to_send; // Devolver el arreglo de bytes (uint8_t*)
 }

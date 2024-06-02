@@ -13,7 +13,7 @@
 #define GET_WATER_LEVEL 7
 #define REPLY_WATER_LEVEL 8
 #define NULO 0
-#define MAX_SECONDS_PUMP_ON 60
+#define MAX_SECONDS_PUMP_ON 50
 
 // Variables
 int seconds = 0;
@@ -163,6 +163,7 @@ void setup() {
   iniciar_timer();
   set_last_filling_date(cattle_waterer_selected);
   reset_last_check_filling_date(cattle_waterer_selected);
+  set_days_without_filling(0, cattle_waterer_selected);
   max_water_level = get_max_water_level(cattle_waterer_selected);
   Serial.print("max water level: ");
   Serial.println(max_water_level);
