@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
     private var userNotifiedAboutWaterTemperature: Boolean = false
     private var userNotifiedAboutWaterQuality: Boolean = false
     private var userNotifiedAboutWaterLevel: Boolean = false
-    private val qualityLectureError: Int = 0
+    private val qualityLectureError: Int = 99
 
     // Vars for water temperature
     private lateinit var waterTemperatureView: CardView
@@ -277,8 +277,12 @@ class MainActivity : AppCompatActivity() {
                 textViewWaterTemperature.text = "${averageTemperature.toInt()}ºC / ${maxTemperature.toInt()}ºC"
 
                 // Calculate percentage and update progressBar
-                val progressBarPercentage = ((averageTemperature * 100) / maxTemperature).toInt()
+                var progressBarPercentage = ((averageTemperature * 100) / maxTemperature).toInt()
                 Log.d("MainActivity", "Porcentaje temperatura: $progressBarPercentage")
+                if (progressBarPercentage > 100) {
+                    progressBarPercentage = 100
+                }
+
                 progressBarWaterTemperature.progress = progressBarPercentage
                 progressBarWaterTemperatureText.text = "${progressBarPercentage}%"
 
@@ -328,7 +332,7 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun updateWaterQuality() {
-        if (waterQuality != 99) {
+        if (waterQuality != qualityLectureError) {
             val waterQualityMessage: String = when {
                 waterQuality < medDaysWithoutFill  -> "Calidad del agua: excelente"
                 waterQuality < maxDaysWithoutFill -> "Calidad del agua: buena"
