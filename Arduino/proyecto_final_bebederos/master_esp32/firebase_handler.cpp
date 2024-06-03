@@ -21,6 +21,7 @@ const long gmtOffset_sec = -3 * 3600;
 const int daylightOffset_sec = 0;
 
 int next_backup = 0;
+String last_filling_date_value_aux = "";
 
 void setup_wifi_firebase() {
   WiFi.begin(wifi_ssid, wifi_password);
@@ -136,6 +137,8 @@ void set_last_filling_date(int cattle_waterer_selected) {
             year, month, day,
             hour, minute, second);
 
+    last_filling_date_value_aux = String(last_filling_date_value);
+
     if (!Firebase.RTDB.setString(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/backup_data/last_filling_date", last_filling_date_value)) {
       Serial.println("in function set_last_filling_date: failed to set data in Firebase function");
     }
@@ -160,11 +163,11 @@ void backup_current_data(int cattle_waterer_selected) {
           if (fbdo.dataType() == "json") {
             if (json.setJsonData(fbdo.payload())) {
               // Make backup path with parsed date and time
-              char backupPath[100];
-              sprintf(backupPath, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_%d/backup_data/backup_%04d%02d%02d_%02d%02d%02d",
+              char backupPath[200];
+              sprintf(backupPath, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_%d/backup_data/%s/backup_%04d%02d%02d_%02d%02d%02d",
                       cattle_waterer_selected,
-                      year, month, day,
-                      hour, minute, second);
+                      last_filling_date_value_aux.c_str(), // Convertir String a const char*
+                      year, month, day, hour, minute, second);
 
               if (Firebase.RTDB.setJSON(&fbdo, backupPath, &json)) {
                 Serial.println("JSON data backed up successfully in: " + String(backupPath)); // Save current data to backup path

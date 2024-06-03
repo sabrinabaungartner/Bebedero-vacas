@@ -28,7 +28,7 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
         })
     }
 
-    override fun getWaterTemperatures(listener: (List<Double>) -> Unit) {
+    /*override fun getWaterTemperatures(listener: (List<Double>) -> Unit) {
         val backupsRef = mDatabase.child("UsersData").child("zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2").child("cattle_waterer_1").child("backup_data")
 
         // Listener to get backups and last_filling_date
@@ -72,9 +72,59 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
                 Log.d("FirebaseDatabaseHandler", "Error en getWaterTemperatures")
             }
         })
+    }*/
+
+    override fun getWaterTemperatures(listener: (List<Double>) -> Unit) {
+        val backupsRef = mDatabase.child("UsersData").child("zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2").child("cattle_waterer_1").child("backup_data")
+
+        backupsRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val temperatures = mutableListOf<Double>()
+
+                var latestBackup: DataSnapshot? = null
+                var latestTimestamp: String? = null
+
+                // Iterar sobre los nodos para encontrar el más reciente
+                for (backupSnapshot in dataSnapshot.children) {
+                    val timestamp = backupSnapshot.key
+                    if (timestamp != "last_filling_date" && timestamp != "last_check_filling_date") {
+                        if (latestTimestamp == null || timestamp?.compareTo(latestTimestamp) ?: 0 > 0) {
+                            latestBackup = backupSnapshot
+                            latestTimestamp = timestamp
+                        }
+                    }
+                }
+
+                latestBackup?.let { lastBackupSnapshot ->
+                    // Obtener los últimos 10 backups dentro del directorio más reciente
+                    val sortedBackups = lastBackupSnapshot.children.sortedByDescending { it.key }.take(10)
+
+                    // Iterar sobre los últimos 10 backups
+                    for (backupSnapshot in sortedBackups) {
+                        // Obtener el valor de water_temperature de cada backup
+                        val temperature = backupSnapshot.child("water_temperature").getValue(Double::class.java)
+                        temperature?.let { temperatures.add(it) }
+                    }
+                }
+
+                // Si hay menos de 10 elementos, devolver una lista vacía
+                if (temperatures.size < 10) {
+                    listener(emptyList())
+                } else {
+                    // Llamar al listener con la lista de temperaturas de agua obtenida
+                    listener(temperatures)
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.d("FirebaseDatabaseHandler", "Error en getWaterTemperatures")
+                listener(emptyList())
+            }
+        })
     }
 
-    override fun getWaterLevels(listener: (List<Double>) -> Unit) {
+
+    /*override fun getWaterLevels(listener: (List<Double>) -> Unit) {
         val backupsRef = mDatabase.child("UsersData").child("zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2").child("cattle_waterer_1").child("backup_data")
 
         backupsRef.addValueEventListener(object : ValueEventListener {
@@ -115,6 +165,59 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
 
             override fun onCancelled(databaseError: DatabaseError) {
                 Log.d("FirebaseDatabaseHandler", "Error en getWaterLevels")
+            }
+        })
+    }*/
+
+    override fun getWaterLevels(listener: (List<Double>) -> Unit) {
+        val backupsRef = mDatabase.child("UsersData").child("zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2").child("cattle_waterer_1").child("backup_data")
+
+        backupsRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val levels = mutableListOf<Double>()
+
+                var latestBackup: DataSnapshot? = null
+                var latestTimestamp: String? = null
+
+                // Iterar sobre los nodos para encontrar el más reciente
+                for (backupSnapshot in dataSnapshot.children) {
+                    val timestamp = backupSnapshot.key
+                    if (timestamp != "last_filling_date" && timestamp != "last_check_filling_date") {
+                        if (latestTimestamp == null || (timestamp?.compareTo(latestTimestamp)
+                                ?: 0) > 0
+                        ) {
+                            latestBackup = backupSnapshot
+                            latestTimestamp = timestamp
+                        }
+                    }
+                }
+
+                Log.d("FirebaseDatabaseHandler", "latestBackup $latestBackup")
+                latestBackup?.let { lastBackupSnapshot ->
+                    // Obtener los últimos 10 backups dentro del directorio más reciente
+                    val sortedBackups = lastBackupSnapshot.children.sortedByDescending { it.key }.take(10)
+
+                    // Iterar sobre los últimos 10 backups
+                    for (backupSnapshot in sortedBackups) {
+                        // Obtener el valor de water_temperature de cada backup
+                        val level = backupSnapshot.child("water_level").getValue(Double::class.java)
+                        level?.let { levels.add(it) }
+                        Log.d("FirebaseDatabaseHandler", "temperature $level")
+                    }
+                }
+
+                // Si hay menos de 10 elementos, devolver una lista vacía
+                if (levels.size < 10) {
+                    listener(emptyList())
+                } else {
+                    // Llamar al listener con la lista de niveles de agua obtenida
+                    listener(levels)
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.d("FirebaseDatabaseHandler", "Error en getWaterLevels")
+                listener(emptyList())
             }
         })
     }
