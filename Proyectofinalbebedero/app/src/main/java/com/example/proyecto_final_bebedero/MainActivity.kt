@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
 
     private var maxTemperature: Double = 0.0
     private var minWaterLevel: Int = 0
-    private var waterQuality: Int = 1
+    private var waterQuality: Int = 0
     private var maxDaysWithoutFill: Int = 0 //5
     private var medDaysWithoutFill: Int = 0 //2
     private var userNotifiedAboutWaterTemperature: Boolean = false
@@ -350,8 +350,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         else {
-            Log.d("MainActivity", "No water level data available")
-            textViewWaterQuality.text = "Recopilando datos de la calidad del agua..."
+            showErrorWaterQualityData()
         }
     }
 
@@ -369,7 +368,7 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun showErrorWaterQualityData() {
-        Log.d("MainActivity", "No water med quality data available")
+        Log.d("MainActivity", "No water quality data available")
         textViewWaterQuality.text = "Recopilando datos de la calidad del agua..."
     }
 }

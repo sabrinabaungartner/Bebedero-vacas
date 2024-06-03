@@ -2,7 +2,7 @@ package com.example.proyecto_final_bebedero
 import com.github.mikephil.charting.data.Entry
 
 class MyTemperatureHistoryActivity : BaseHistoryActivity() {
-    private val firebaseDatabaseHandler: FirebaseDatabaseInterface = FirebaseDatabaseHandler()
+    /*private val firebaseDatabaseHandler: FirebaseDatabaseInterface = FirebaseDatabaseHandler()
 
     override fun getChartDescription(): String = ""
 
@@ -23,5 +23,5 @@ class MyTemperatureHistoryActivity : BaseHistoryActivity() {
 
             actualizarChart(entries, dates)
         }
-    }
+    }*/
 }

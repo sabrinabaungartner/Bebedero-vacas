@@ -19,10 +19,10 @@ abstract class BaseHistoryActivity : AppCompatActivity() {
 
         lineChart = findViewById(R.id.lineChartHistory)
 
-        getAndProcessData()
+        //getAndProcessData()
     }
 
-    abstract fun getAndProcessData()
+    /*abstract fun getAndProcessData()
     abstract fun getChartDescription(): String
     abstract fun getDataLabel(): String
 
@@ -60,5 +60,5 @@ abstract class BaseHistoryActivity : AppCompatActivity() {
 
         lineChart.data = lineData
         lineChart.invalidate()
-    }
+    }*/
 }
