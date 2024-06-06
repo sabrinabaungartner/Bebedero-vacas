@@ -87,13 +87,11 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
                 // Iterar sobre los nodos para encontrar el más reciente
                 for (backupSnapshot in dataSnapshot.children) {
                     val timestamp = backupSnapshot.key
-                    if (timestamp != "last_filling_date" && timestamp != "last_check_filling_date") {
-                        if (latestTimestamp == null || (timestamp?.compareTo(latestTimestamp)
-                                ?: 0) > 0
-                        ) {
-                            latestBackup = backupSnapshot
-                            latestTimestamp = timestamp
-                        }
+                    if (latestTimestamp == null || (timestamp?.compareTo(latestTimestamp)
+                            ?: 0) > 0
+                    ) {
+                        latestBackup = backupSnapshot
+                        latestTimestamp = timestamp
                     }
                 }
 
@@ -185,13 +183,11 @@ class FirebaseDatabaseHandler : FirebaseDatabaseInterface {
                 // Iterar sobre los nodos para encontrar el más reciente
                 for (backupSnapshot in dataSnapshot.children) {
                     val timestamp = backupSnapshot.key
-                    if (timestamp != "last_filling_date" && timestamp != "last_check_filling_date") {
-                        if (latestTimestamp == null || (timestamp?.compareTo(latestTimestamp)
-                                ?: 0) > 0
-                        ) {
-                            latestBackup = backupSnapshot
-                            latestTimestamp = timestamp
-                        }
+                    if (latestTimestamp == null || (timestamp?.compareTo(latestTimestamp)
+                            ?: 0) > 0
+                    ) {
+                        latestBackup = backupSnapshot
+                        latestTimestamp = timestamp
                     }
                 }
 

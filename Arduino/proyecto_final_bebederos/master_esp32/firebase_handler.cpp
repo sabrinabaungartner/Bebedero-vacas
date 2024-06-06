@@ -20,8 +20,10 @@ const char* ntpServer = "pool.ntp.org";
 const long gmtOffset_sec = -3 * 3600;
 const int daylightOffset_sec = 0;
 
-int next_backup = 0;
-String last_filling_date_value_aux = "";
+// Variable global para almacenar la última fecha de llenado
+String last_filling_date_value_global = "0";
+// Variable global para almacenar la última fecha de chequeo
+String last_check_filling_date_global = "0";
 
 void setup_wifi_firebase() {
   WiFi.begin(wifi_ssid, wifi_password);
@@ -101,22 +103,8 @@ int get_next_backup_struct(int cattle_waterer_selected) {
   return 0;
 }
 
-/*void set_current_data_into_backup(int year, int month, int day, int hour, int minute, int second, int cattle_waterer_selected) {
-  if (Firebase.ready()) {
-    char datetime_str[20];
-    sprintf(datetime_str, "%04d%02d%02d_%02d%02d%02d",
-            year, month, day,
-            hour, minute, second);
-
-    String firebasePath = "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/last_backup_modified";
-    if (Firebase.RTDB.setString(&fbdo, firebasePath.c_str(), datetime_str)) {
-      Serial.println("Current data stored in Firebase at " + firebasePath);
-    } else { Serial.println("in function set_current_data_into_backup: failed to set data in Firebase function"); }
-  } else { Serial.println("in function set_current_data_into_backup: Firebase not ready"); }
-}*/
-
 void set_last_filling_date(int cattle_waterer_selected) {
-  if (Firebase.ready()) {
+  //if (Firebase.ready()) {
     struct tm timeinfo;
     if (!getLocalTime(&timeinfo)) {
       Serial.println("Failed to obtain time");
@@ -137,12 +125,13 @@ void set_last_filling_date(int cattle_waterer_selected) {
             year, month, day,
             hour, minute, second);
 
-    last_filling_date_value_aux = String(last_filling_date_value);
+    last_filling_date_value_global = String(last_filling_date_value);
 
-    if (!Firebase.RTDB.setString(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/backup_data/last_filling_date", last_filling_date_value)) {
+    /*if (!Firebase.RTDB.setString(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/last_filling_date", last_filling_date_value)) {
       Serial.println("in function set_last_filling_date: failed to set data in Firebase function");
     }
-  } else { Serial.println("in function set_last_filling_date: Firebase not ready"); }
+  } else { Serial.println("in function set_last_filling_date: Firebase not ready"); }*/
+  Serial.println("Date saved locally: " + last_filling_date_value_global);
 }
 
 void backup_current_data(int cattle_waterer_selected) {
@@ -166,7 +155,7 @@ void backup_current_data(int cattle_waterer_selected) {
               char backupPath[200];
               sprintf(backupPath, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_%d/backup_data/%s/backup_%04d%02d%02d_%02d%02d%02d",
                       cattle_waterer_selected,
-                      last_filling_date_value_aux.c_str(), // Convertir String a const char*
+                      last_filling_date_value_global.c_str(), // Convertir String a const char*
                       year, month, day, hour, minute, second);
 
               if (Firebase.RTDB.setJSON(&fbdo, backupPath, &json)) {
@@ -193,46 +182,6 @@ int get_cattle_waterer_selected() {
   return 0;
 }
 
-/*void check_and_delete_old_backups(int cattle_waterer_selected) {
-  if (Firebase.ready()) {
-      
-    String backupPath = "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/backup_data";
-
-    FirebaseJson backups;
-    if (Firebase.RTDB.getJSON(&fbdo, backupPath)) {
-      if (fbdo.dataType() == "json") {
-        if (backups.setJsonData(fbdo.payload())) {
-          size_t backupCount = backups.iteratorBegin();
-          
-          for (size_t i = 0; i < backupCount; ++i) {
-              // Obtener el valor del backup en la posición actual
-              FirebaseJson::IteratorValue backup = backups.valueAt(i);
-              
-              // Obtener la clave (nombre del backup) y el valor (datos del backup)
-              String backupKey = backup.key.c_str();
-              Serial.print("backupkey: ");
-              Serial.println(backupKey);*/
-//FirebaseJson backupData = backup.value;
-
-/*String date = backupData["date"].to<String>();
-              Serial.print("Backup Key: ");
-              Serial.println(backupKey);
-              Serial.print("Date: ");
-              Serial.println(date);*/
-
-// Por ejemplo, puedes implementar lógica para eliminar backups antiguos
-// if (daysWithoutFilling > 7) {
-//     Firebase.RTDB.deleteNode(backupPath + "/" + backupKey);
-// }
-/* }
-          
-          backups.iteratorEnd(); // Liberar memoria utilizada durante la iteración
-        } else {Serial.println("!backups.setJsonData in check_and_delete_old_backups");} 
-      } else {Serial.println("!dataType in check_and_delete_old_backups");}
-    } else {Serial.println("!Firebase.RTDB.getJSON in check_and_delete_old_backups");}
-  } else {Serial.println("!firebase.ready in check_and_delete_old_backups");}
-}*/
-
 void update_days_without_filling_in_firebase(int cattle_waterer_selected) {
   if (Firebase.ready()) {
     if (Firebase.RTDB.getInt(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/current_data/days_without_filling")){
@@ -257,9 +206,10 @@ void update_days_without_filling(int cattle_waterer_selected) {
     }
 
     // Retrieve the last filled date from Firebase
-    if (Firebase.RTDB.getString(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/backup_data/last_filling_date")) {
-      const char* last_filled_date = fbdo.stringData().c_str();
-
+    //if (Firebase.RTDB.getString(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/last_filling_date")) {
+    //  const char* last_filled_date = fbdo.stringData().c_str();
+    if (last_filling_date_value_global.length() > 0) {
+      const char* last_filled_date = last_filling_date_value_global.c_str();
       int year, month, day, hour, minute, second;
       sscanf(last_filled_date, "%4d%2d%2d_%2d%2d%2d", &year, &month, &day, &hour, &minute, &second);
 
@@ -272,10 +222,10 @@ void update_days_without_filling(int cattle_waterer_selected) {
       lastFilledTime.tm_min = minute;
       lastFilledTime.tm_sec = second;
 
-      //if (lastFilledTime.tm_year != 0) { // Variable last_filling_date was set in Firebase
         // Get date from last_check_filling_date from Firebase
-        if (Firebase.RTDB.getString(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/backup_data/last_check_filling_date")) {
-          const char* last_check_date = fbdo.stringData().c_str();  // Get last check date as const char*
+        //if (Firebase.RTDB.getString(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/last_check_filling_date")) {
+        if (last_check_filling_date_global.length() > 0)  {
+          const char* last_check_date = last_check_filling_date_global.c_str();  // Get last check date as const char*
 
           int checkYear, checkMonth, checkDay, checkHour, checkMinute, checkSecond;
           sscanf(last_check_date, "%4d%2d%2d_%2d%2d%2d", &checkYear, &checkMonth, &checkDay, &checkHour, &checkMinute, &checkSecond);
@@ -289,10 +239,10 @@ void update_days_without_filling(int cattle_waterer_selected) {
           lastCheckTime.tm_min = checkMinute;
           lastCheckTime.tm_sec = checkSecond;
 
-          // Check if 20 minutes have passed since last_filling_date
+          // Check if 5 minutes have passed since last_filling_date
           if (difftime(mktime(&timeinfo), mktime(&lastFilledTime)) >= 300) { // 5 minutes in seconds (5 * 60 = 300)
             // If last_check_filling_date is not set (== 0) or 5 minutes have passed since last check
-            if (lastCheckTime.tm_year == 0 || difftime(mktime(&timeinfo), mktime(&lastCheckTime)) >= 300) {
+            if ((last_check_filling_date_global == "0") || difftime(mktime(&timeinfo), mktime(&lastCheckTime)) >= 300) {
               // Update days_without_filling in Firebase
               update_days_without_filling_in_firebase(cattle_waterer_selected);
 
@@ -300,13 +250,15 @@ void update_days_without_filling(int cattle_waterer_selected) {
               char current_date_time[20];
               sprintf(current_date_time, "%04d%02d%02d_%02d%02d%02d", timeinfo.tm_year + 1900, timeinfo.tm_mon + 1, timeinfo.tm_mday, timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
 
-              if (Firebase.RTDB.setString(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/backup_data/last_check_filling_date", current_date_time)) {
+              /*if (Firebase.RTDB.setString(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/last_check_filling_date", current_date_time)) {
                 Serial.println("in function update_days_without_filling_in_firebase: updated last_check_filling_date in Firebase");
-              } else { Serial.println("in function update_days_without_filling: failed to set data last_check_filling_date in Firebase function"); }
+              } else { Serial.println("in function update_days_without_filling: failed to set data last_check_filling_date in Firebase function"); }*/
+
+              last_check_filling_date_global = String(current_date_time);
+              Serial.println("Updated last_check_filling_date locally: " + last_check_filling_date_global);
             }
           }
         } else { Serial.println("in function update_days_without_filling_in_firebase: failed to get data last_check_filling_date from firebase function"); } 
-      //} else { Serial.println("in function update_days_without_filling_in_firebase: last_filling_date was not set in firebase! (== 0)"); }
     } else { Serial.println("in function update_days_without_filling_in_firebase: failed to get data last_filling_date from firebase function"); }
   } else { Serial.println("in function update_days_without_filling: Firebase not ready"); }
 }
@@ -360,7 +312,9 @@ int get_max_water_level(int cattle_waterer_selected) {
 }
 
 void reset_last_check_filling_date(int cattle_waterer_selected) {
-  if (Firebase.RTDB.setString(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/backup_data/last_check_filling_date", String(0))) {
+  /*if (Firebase.RTDB.setString(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/last_check_filling_date", String(0))) {
       Serial.println("in function reset_last_check_filling_date: updated last_check_filling_date in Firebase to 0");
-  } else { Serial.println("in function reset_last_check_filling_date: failed to set data last_check_filling_date in Firebase function to 0"); }
+  } else { Serial.println("in function reset_last_check_filling_date: failed to set data last_check_filling_date in Firebase function to 0"); }*/
+  last_check_filling_date_global = "0";
+  Serial.println("Updated last_check_filling_date locally: " + last_check_filling_date_global);
 }

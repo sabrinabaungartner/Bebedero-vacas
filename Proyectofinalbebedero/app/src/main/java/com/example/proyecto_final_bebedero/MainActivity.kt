@@ -332,7 +332,7 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun updateWaterQuality() {
-        if (waterQuality != qualityLectureError) {
+        if (waterQuality != qualityLectureError && (medDaysWithoutFill != qualityLectureError) && (maxDaysWithoutFill != qualityLectureError)) {
             val waterQualityMessage: String = when {
                 waterQuality < medDaysWithoutFill  -> "Calidad del agua: excelente"
                 waterQuality < maxDaysWithoutFill -> "Calidad del agua: buena"
