@@ -16,8 +16,8 @@
             android:id="@+id/imageViewBackground"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-        android:src="@drawable/background2"
-        android:scaleType="centerCrop"
+            android:src="@drawable/background2"
+            android:scaleType="centerCrop"
             android:contentDescription="background_login"
             tools:ignore="HardcodedText" />
 
