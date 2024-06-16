@@ -13,10 +13,12 @@ BluetoothSerial SerialBT;
 void callback(esp_spp_cb_event_t event, esp_spp_cb_param_t *param){
   if (event == ESP_SPP_CLOSE_EVT) {
     digitalWrite(LED_BT_BLUE, LOW);
+    digitalWrite(LED_BT_GREEN, LOW);
   }
 
   if (event == ESP_SPP_SRV_OPEN_EVT) { 
     digitalWrite(LED_BT_BLUE, HIGH);
+    digitalWrite(LED_BT_GREEN, HIGH);
   }
 }
 
@@ -30,7 +32,9 @@ void setup_bluetooth_configuration() {
   SerialBT.register_callback(callback);
   SerialBT.begin(device_name);
   pinMode(LED_BT_BLUE, OUTPUT);
+  pinMode(LED_BT_GREEN, OUTPUT);
   digitalWrite(LED_BT_BLUE, LOW);
+  digitalWrite(LED_BT_GREEN, LOW);
 }
 
 void assemble_package_water_level(uint8_t size, uint8_t reply, int water_level, float water_temperature, uint8_t pump_status) {

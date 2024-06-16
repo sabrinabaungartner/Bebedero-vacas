@@ -15,6 +15,7 @@
 #define GET_WATER_LEVEL 7
 #define REPLY_WATER_LEVEL 8
 #define NULO 0
+#define LED_MICRO_ON 22
 
 // Variables
 uint8_t seconds = 0;
@@ -33,6 +34,8 @@ void read_water_level_from_sensor();
 
 void setup() {
   Serial.begin(115200);
+  pinMode(LED_MICRO_ON, OUTPUT);
+  digitalWrite(LED_MICRO_ON, HIGH);
   setup_bluetooth_configuration();
   setup_water_level_sensor();
   setup_water_temperature_sensor();

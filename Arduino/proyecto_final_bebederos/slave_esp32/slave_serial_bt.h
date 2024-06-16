@@ -4,6 +4,7 @@
 #include "BluetoothSerial.h"
 
 #define LED_BT_BLUE 2
+#define LED_BT_GREEN 23
 #define ESCAPE_CHARACTER '/'
 
 extern String device_name;

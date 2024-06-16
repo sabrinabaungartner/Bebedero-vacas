@@ -57,6 +57,7 @@ void request_and_receive_water_level_and_temperature() {
 void reset_values_after_filling_waterer() {
   set_fill_waterer(0, cattle_waterer_selected);
   set_last_filling_date(cattle_waterer_selected);
+  set_last_filling_date_firebase(cattle_waterer_selected);
   set_days_without_filling(0, cattle_waterer_selected);
   reset_last_check_filling_date(cattle_waterer_selected);
   set_is_water_pump_enabled(0, cattle_waterer_selected); // Android app detects this change and use it to enable "rellenar bebedero" button
@@ -159,9 +160,14 @@ void setup() {
   setup_wifi_firebase();
   set_NTP_server();
   setup_bluetooth_configuration();
+  while (!check_slave_is_connected()) {
+    Serial.println("Serial BT communicaton is not seted!");
+    connect_to_slave();
+  }
   fnqueue_init();
   iniciar_timer();
   set_last_filling_date(cattle_waterer_selected);
+  set_last_filling_date_firebase(cattle_waterer_selected);
   reset_last_check_filling_date(cattle_waterer_selected);
   set_days_without_filling(0, cattle_waterer_selected);
   max_water_level = get_max_water_level(cattle_waterer_selected);

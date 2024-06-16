@@ -318,3 +318,11 @@ void reset_last_check_filling_date(int cattle_waterer_selected) {
   last_check_filling_date_global = "0";
   Serial.println("Updated last_check_filling_date locally: " + last_check_filling_date_global);
 }
+
+void set_last_filling_date_firebase(int cattle_waterer_selected) {
+  if (Firebase.ready()) {
+    if (!Firebase.RTDB.setString(&fbdo, "UsersData/zmEF5GNXqOTqIzXlmnjdJ4EQ4NK2/cattle_waterer_" + String(cattle_waterer_selected) + "/last_filling_date", last_filling_date_value_global)) {
+      Serial.println("in function set_last_filling_date_firebase: failed to set last filling date in firebase function");
+    }
+  } else { Serial.println("in function set_last_filling_date_firebase: Firebase not ready"); }
+}
