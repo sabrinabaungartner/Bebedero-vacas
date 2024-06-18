@@ -51,9 +51,4 @@ void update_days_without_filling(int cattle_waterer_selected);
 /** Set to Firebase database days without filling the cattle waterer in current data */
 void set_days_without_filling(int value, int cattle_waterer_selected);
 
-/** Set to Firebase database last filling date */
-void set_last_filling_date_firebase(int cattle_waterer_selected);
-
-//void check_and_delete_old_backups(int cattle_waterer_selected);
-
 #endif
