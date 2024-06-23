@@ -1,1 +1,0 @@
-Este el primer diseño creado para el bebedero. Mi idea es acomodarlo e integrar más bebederos, por lo que dejo este acá como backup.
